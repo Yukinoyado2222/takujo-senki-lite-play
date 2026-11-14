@@ -1,0 +1,1 @@
+# takujo-senki-lite-play
