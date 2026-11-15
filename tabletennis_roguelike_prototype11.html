@@ -339,7 +339,7 @@ const state={
  finisherPending:false,finisherRecoil:false,powerPending:false,powerRecoil:false,feintPending:false,knucklePending:false,
  aiError:null,aiRecoveryAttempts:0,aiResumeAtLimitUsed:false,enemyHitToken:0,
  selectedServe:null,selectedServeCourse:null,selectedShot:null,
- lastPointResult:null,overworkUpgrades:null,matchFinished:false,history:{},log:[],upgradedTechs:[],upgradedServes:[],equipment:{carbon:false,sticky:false,shoes:false},eventCandidates:[],eventOptions:[],eventMode:null,eventDone:false,eventRerolling:false,specialCardsGained:[],restBonusMatch:null
+ lastPointResult:null,overworkUpgrades:null,matchFinished:false,history:{},log:[],upgradedTechs:[],upgradedServes:[],equipment:{carbon:false,sticky:false,shoes:false},eventCandidates:[],eventOptions:[],eventMode:null,eventDone:false,preparing:false,eventRerolling:false,specialCardsGained:[],restBonusMatch:null
 };
 
 const enemy={
@@ -577,7 +577,7 @@ function newRun(){
   state.learned=["push","foreDrive","backBlock"];
   state.serves=["underShort","knuckleLong"];
   state.deck=["focus","focus","focus","power","power","power"];
-  state.history={};state.log=[];state.upgradedTechs=[];state.upgradedServes=[];state.equipment={carbon:false,sticky:false,shoes:false};state.eventCandidates=[];state.eventOptions=[];state.eventMode=null;state.eventDone=false;state.eventRerolling=false;state.specialCardsGained=[];
+  state.history={};state.log=[];state.upgradedTechs=[];state.upgradedServes=[];state.equipment={carbon:false,sticky:false,shoes:false};state.eventCandidates=[];state.eventOptions=[];state.eventMode=null;state.eventDone=false;state.preparing=false;state.eventRerolling=false;state.specialCardsGained=[];
   addLog("新しいラン。初期スキルカード3種、初期サーブカード2種。");
   setupMatchByNumber();resetCardPiles();pointReset();render();
 }
@@ -602,11 +602,29 @@ function requestNewRun(){
   return true;
 }
 function nextMatch(){
-  if(devBossSession||state.runFinished||state.matchNumber>=10||state.phase!=="growth"||!state.eventDone)return false;
-  state.view="match";state.matchNumber++;if(state.restBonusMatch!==state.matchNumber)state.restBonusMatch=null;state.my=0;state.enemy=0;state.history={};state.eventCandidates=[];state.eventOptions=[];state.eventMode=null;state.eventDone=false;state.eventRerolling=false;state.overworkUpgrades=null;state.matchFinished=false;
+  if(devBossSession||state.runFinished||state.preparing||state.matchNumber>=10||state.phase!=="growth"||!state.eventDone)return false;
+  state.matchNumber++;
   const label=setupMatchByNumber();
-  addLog("第"+state.matchNumber+"試合："+label+"。");
+  state.preparing=true;state.phase="preparation";state.view="progress";
+  addLog("第"+state.matchNumber+"試合の対戦準備："+label+"。");
+  renderGrowth(0);render();return true;
+}
+function startPreparedMatch(){
+  if(devBossSession||state.runFinished||!state.preparing||state.phase!=="preparation")return false;
+  state.preparing=false;state.view="match";
+  if(state.restBonusMatch!==state.matchNumber)state.restBonusMatch=null;
+  state.my=0;state.enemy=0;state.history={};state.eventCandidates=[];state.eventOptions=[];state.eventMode=null;state.eventDone=false;state.eventRerolling=false;state.overworkUpgrades=null;state.matchFinished=false;
   resetCardPiles();pointReset();render();return true;
+}
+function renderMatchPreparation(){
+  const list=(ids,upgraded,defs,withType)=>ids.map(id=>"<li>"+defs[id].name+(withType?"（"+defs[id].type+"）":"")+(upgraded.includes(id)?" ＋強化":"")+"</li>").join("");
+  const section=(title,body)=>"<section class='notice' style='grid-column:1/-1'><b>"+title+"</b><ul>"+body+"</ul></section>";
+  return "<div class='notice' style='grid-column:1/-1'><b>第"+state.matchNumber+"試合｜対戦準備</b><p>対戦相手："+enemy.name+" ／ "+state.matchTarget+"点先取</p></div>"+
+    section("相手の使用技術",list(enemy.techs,enemy.upgradedTechs,TECHS,true))+
+    section("相手のサーブ",list(enemy.serves,enemy.upgradedServes,SERVES,false))+
+    section("自分の所持技術",list(state.learned,state.upgradedTechs,TECHS,true))+
+    section("自分のサーブ",list(state.serves,state.upgradedServes,SERVES,false))+
+    "<div class='notice' style='grid-column:1/-1'>所持GP："+state.gp+"pt</div>";
 }
 
 function phaseName(){
@@ -614,7 +632,7 @@ function phaseName(){
 }
 function navigationViews(){
   if(state.runFinished)return ["start","history","log","result"];
-  if(state.phase==="growth")return ["start","progress","history","log"];
+  if(state.phase==="growth"||state.phase==="preparation")return ["start","progress","history","log"];
   return ["start","match","history","log"];
 }
 function setView(view){
@@ -624,8 +642,8 @@ function setView(view){
   if(devBossResultVisible)return false;
   if(state.runFinished&&(view==="match"||view==="progress"))view="result";
   else if(!state.runFinished&&view==="result")view=state.phase==="growth"?"progress":"match";
-  else if(!state.runFinished&&state.phase==="growth"&&view==="match")view="progress";
-  else if(!state.runFinished&&state.phase!=="growth"&&view==="progress")view="match";
+  else if(!state.runFinished&&(state.phase==="growth"||state.phase==="preparation")&&view==="match")view="progress";
+  else if(!state.runFinished&&state.phase!=="growth"&&state.phase!=="preparation"&&view==="progress")view="match";
   state.view=view;
   render();
   return true;
@@ -643,8 +661,8 @@ function render(){
   $("startView").classList.toggle("hidden",state.view!=="start");
   $("historyPanel").classList.toggle("hidden",state.view!=="history");
   $("growthPanel").classList.toggle("hidden",state.view!=="progress"&&state.view!=="result");
-  $("progressTitle").textContent=state.runFinished?"最終結果":state.eventDone?"成長・強化":"イベント選択・成長";
-  $("progressMode").textContent=state.runFinished?"ラン終了":state.eventDone?"次試合待ち":"進行中";
+  $("progressTitle").textContent=state.runFinished?"最終結果":state.preparing?"対戦準備":state.eventDone?"成長・強化":"イベント選択・成長";
+  $("progressMode").textContent=state.runFinished?"ラン終了":state.preparing?"試合開始待ち":state.eventDone?"次試合待ち":"進行中";
   const visibleViews=navigationViews();
   document.querySelectorAll("[data-view]").forEach(b=>{const active=b.dataset.view===state.view;b.hidden=!visibleViews.includes(b.dataset.view);b.setAttribute("aria-current",active?"page":"false");});
   $("servePanel").classList.toggle("hidden",state.phase!=="serve");
@@ -1419,6 +1437,7 @@ function selectEvent(id){
   state.eventCandidates=[];
   state.eventOptions=[];
   if(id==="coach")state.eventOptions=coachEligibleTechs().sort(()=>Math.random()-.5).slice(0,3);
+  if(id==="training")state.eventOptions=SPECIAL_CARDS.filter(card=>!state.specialCardsGained.includes(card)).sort(()=>Math.random()-.5).slice(0,3);
   renderGrowth(0);render();
   return true;
 }
@@ -1444,10 +1463,12 @@ function finalResultSummary(){
   const lastPoint=state.lastPointResult?"<p>最終ポイント："+(state.lastPointResult.winner==="win"?"自分の得点":"相手の得点")+"</p>":"";
   return "<div class=notice style='grid-column:1/-1'><h2>"+(won?"勝利！":"敗北…")+"</h2><b>"+(won?"全10試合クリア！":"第10試合で敗北しました。")+"</b><p>最終スコア："+state.my+" - "+state.enemy+"</p>"+lastPoint+"<p>最終試合の獲得GP："+matchGpReward(state.my,state.enemy,state.matchTarget)+"pt</p><p>所持GP："+state.gp+"pt</p><h3>所持カード（"+state.deck.length+"枚）</h3><ul>"+cards+"</ul></div>";
 }
-function acquireSpecialCard(id){if(state.runFinished||state.eventDone||state.eventMode!=="training"||state.gp<2||!SPECIAL_CARDS.includes(id)||state.specialCardsGained.includes(id))return false;state.gp-=2;state.specialCardsGained.push(id);state.deck.push(id);addLog("特訓で「"+CARDS[id].name+"」を獲得。");finishEvent();return true}
+function acquireSpecialCard(id){if(state.runFinished||state.eventDone||state.eventMode!=="training"||state.gp<2||!state.eventOptions.includes(id)||state.specialCardsGained.includes(id))return false;state.gp-=2;state.specialCardsGained.push(id);state.deck.push(id);addLog("特訓で「"+CARDS[id].name+"」を獲得。");finishEvent();return true}
 function renderGrowth(earned){
   const box=$("growth");box.innerHTML="";
   if(state.runFinished){$("growthText").innerHTML="";box.innerHTML=finalResultSummary();$("next").style.display="none";return}
+  if(state.preparing){$("growthText").innerHTML="";box.innerHTML=renderMatchPreparation();$("next").style.display="block";$("next").textContent="試合開始";return}
+  $("next").textContent="対戦準備へ";
   $("growthText").innerHTML="<div class=big>"+(state.my>=state.matchTarget?"勝利":"敗北")+"</div><p style=text-align:center>"+state.my+" - "+state.enemy+"<br>獲得 <b>"+earned+"pt</b> ／ 所持 <b>"+state.gp+"pt</b></p>";
   $("next").style.display="block";
   if(state.eventMode==="choose"){
@@ -1469,7 +1490,7 @@ function renderGrowth(earned){
     [...eligibleUpgradeTechs(),...eligibleUpgradeServes()].forEach(id=>{const o=TECHS[id]||SERVES[id],b=document.createElement("button");b.className="btn";b.innerHTML="<b>"+o.name+" → ＋　1pt</b><small>"+UPGRADE_EFFECTS[id]+"</small>";b.onclick=()=>{if(state.runFinished||state.eventDone||state.eventMode!=="practice")return;if(state.gp<1){showGpShortage(b,1);return}state.gp-=1;upgrade(id);finishEvent()};box.appendChild(b)});return;
   }
   if(state.eventMode==="training"){
-    const ids=SPECIAL_CARDS.filter(id=>!state.specialCardsGained.includes(id));box.innerHTML="<div class=notice style='grid-column:1/-1'><b>特訓：2ptでスペシャルカードを1枚獲得</b><br>所持 "+state.gp+"pt</div>";
+    const ids=state.eventOptions;box.innerHTML="<div class=notice style='grid-column:1/-1'><b>特訓：2ptでスペシャルカードを1枚獲得</b><br>所持 "+state.gp+"pt</div>";
     ids.forEach(id=>{const b=document.createElement("button");b.className="btn";b.innerHTML="<b>"+CARDS[id].name+"　2pt</b><small>"+CARDS[id].desc+"</small>";b.onclick=()=>{if(state.runFinished||state.eventDone||state.eventMode!=="training")return;if(state.gp<2){showGpShortage(b,2);return}acquireSpecialCard(id)};box.appendChild(b)});return;
   }
   if(state.eventMode==="equipment"){
@@ -1581,7 +1602,7 @@ function finishMatch(){
   }else{state.view="progress";beginEvents();}
   renderGrowth(earned);render();return true;
 }
-$("next").onclick=()=>{if(state.runFinished||state.matchNumber>=10)return;if(state.eventMode!==null){skipEvent();return}if(state.eventDone)nextMatch()};$("restart").onclick=requestNewRun;
+$("next").onclick=()=>{if(state.runFinished)return;if(state.preparing){startPreparedMatch();return}if(state.matchNumber>=10)return;if(state.eventMode!==null){skipEvent();return}if(state.eventDone)nextMatch()};$("restart").onclick=requestNewRun;
 newRun();
 </script>
 </body></html>
