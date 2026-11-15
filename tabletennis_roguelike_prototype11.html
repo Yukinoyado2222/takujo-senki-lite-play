@@ -1087,7 +1087,7 @@ function enemyHit(token){
   // On invalid/unavailable lookahead or all-zero V, maximize enemy success.
   // Invalid success numbers are excluded from fallback comparison.
   const pool=fallback?choices.filter(o=>Number.isFinite(o.success)):
-    choices.filter(o=>maxValue-o.value<=0.08+1e-12);
+    choices.filter(o=>o.value>=maxValue*0.8-1e-12);
   if(pool.length===0){
     enterEnemyAIError({reason:"invalid-candidates",rawTechIds,validTechIds,eligibleTechIds,ball:b});
     return;
