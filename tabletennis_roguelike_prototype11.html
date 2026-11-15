@@ -263,17 +263,17 @@ const SPIN_STEPS=["下2","下1","無","上1","上2"];
 const SPIN_LEVEL_LIMIT=2;
 
 const TECHS={
- push:{name:"ツッツキ",side:"both",base:86,power:-1,idealSpin:"下1",idealSpinsPlus:["下1","下2"],idealPower:1,idealLength:"ショート",desc:"下回転に強い安定技。"},
- stop:{name:"ストップ",side:"both",base:86,power:-1,idealSpins:["下1","無"],idealPower:1,idealLength:"ショート",outputLength:"ショート",desc:"ネット際へ短く落とす下回転の返球。"},
- foreDrive:{name:"フォアドライブ",side:"F",base:79,power:1,idealSpins:["下1","無","上1"],idealPower:1,idealLength:"ロング",desc:"基本的な攻撃技。"},
- backBlock:{name:"バックブロック",side:"B",base:84,power:0,idealSpin:"上1",idealPowers:[2,3],idealLength:"ロング",desc:"バック面で安定して受ける。"},
- foreSmash:{name:"スマッシュ",side:"F",base:75,power:3,idealSpin:"無",idealPower:1,idealLength:"ロング",desc:"高速だが不適正球では成功率が低下する決定打。"},
- backDrive:{name:"バックドライブ",side:"B",base:74,power:1,idealSpins:["下1","無","上1"],idealPower:1,idealLength:"ロング",idealLengthPlus:["ショート","ロング"],desc:"バック面の攻撃技。＋強化で適正長さにショートを追加。"},
- foreBlock:{name:"フォアブロック",side:"F",base:84,power:0,idealSpin:"上1",idealPowers:[2,3],idealLength:"ロング",desc:"フォア面で安定して受ける。"},
- foreFlick:{name:"フォアフリック",side:"F",base:72,power:0,idealSpins:["上1","無","下1"],idealPower:1,idealLength:"ショート",desc:"ショートボールへの攻撃。"},
- backFlick:{name:"バックフリック",side:"B",base:72,power:0,idealSpins:["上1","無","下1"],idealPower:1,idealLength:"ショート",desc:"バック面のショート攻撃。"},
- foreCut:{name:"フォアカット",side:"F",base:78,power:-1,idealSpins:["無","上1"],idealPower:3,idealLength:"ロング",desc:"フォア面で強い下回転をかける守備技。"},
- backCut:{name:"バックカット",side:"B",base:78,power:-1,idealSpins:["無","上1"],idealSpinsPlus:["無","上1","上2"],idealPower:3,idealLength:"ロング",desc:"バック面で強い下回転をかける守備技。"}
+ push:{type:"守備",name:"ツッツキ",side:"both",base:86,power:-1,idealSpin:"下1",idealSpinsPlus:["下1","下2"],idealPower:1,idealLength:"ショート",desc:"下回転に強い安定技。"},
+ stop:{type:"守備",name:"ストップ",side:"both",base:86,power:-1,idealSpins:["下1","無"],idealPower:1,idealLength:"ショート",outputLength:"ショート",desc:"ネット際へ短く落とす下回転の返球。"},
+ foreDrive:{type:"攻撃",name:"フォアドライブ",side:"F",base:79,power:1,idealSpins:["下1","無","上1"],idealPower:1,idealLength:"ロング",desc:"基本的な攻撃技。"},
+ backBlock:{type:"守備",name:"バックブロック",side:"B",base:84,power:0,idealSpin:"上1",idealPowers:[2,3],idealLength:"ロング",desc:"バック面で安定して受ける。"},
+ foreSmash:{type:"攻撃",name:"スマッシュ",side:"F",base:75,power:3,idealSpin:"無",idealPower:1,idealLength:"ロング",desc:"高速だが不適正球では成功率が低下する決定打。"},
+ backDrive:{type:"攻撃",name:"バックドライブ",side:"B",base:74,power:1,idealSpins:["下1","無","上1"],idealPower:1,idealLength:"ロング",idealLengthPlus:["ショート","ロング"],desc:"バック面の攻撃技。＋強化で適正長さにショートを追加。"},
+ foreBlock:{type:"守備",name:"フォアブロック",side:"F",base:84,power:0,idealSpin:"上1",idealPowers:[2,3],idealLength:"ロング",desc:"フォア面で安定して受ける。"},
+ foreFlick:{type:"攻撃",name:"フォアフリック",side:"F",base:72,power:0,idealSpins:["上1","無","下1"],idealPower:1,idealLength:"ショート",desc:"ショートボールへの攻撃。"},
+ backFlick:{type:"攻撃",name:"バックフリック",side:"B",base:72,power:0,idealSpins:["上1","無","下1"],idealPower:1,idealLength:"ショート",desc:"バック面のショート攻撃。"},
+ foreCut:{type:"守備",name:"フォアカット",side:"F",base:78,power:-1,idealSpins:["無","上1"],idealPower:3,idealLength:"ロング",desc:"フォア面で強い下回転をかける守備技。"},
+ backCut:{type:"守備",name:"バックカット",side:"B",base:78,power:-1,idealSpins:["無","上1"],idealSpinsPlus:["無","上1","上2"],idealPower:3,idealLength:"ロング",desc:"バック面で強い下回転をかける守備技。"}
 };
 // Lite success-level foundation. This stage does not yet replace legacy percent calculations.
 const LITE_SUCCESS_RATES=Object.freeze([5,20,35,50,65,80,95]);
@@ -317,15 +317,15 @@ const SERVES={
 };
 
 const CARDS={
- focus:{name:"集中",desc:"この1球の成功レベル◆+1。"},
- power:{name:"強打",desc:"返球速度+1、成功レベル◆−1。"},
- third:{name:"3球目攻撃",desc:"3球目で使うと成功レベル◆+1、返球速度+1。"},
- desperation:{name:"背水の陣",desc:"相手にリードされていると成功レベル◆+1。"},
- whiff:{name:"空振り",desc:"効果なし。"},
- counter:{name:"カウンター",desc:"選択技術の適正速度+2。実際の返球速度は変化しない。"},
- finisher:{name:"とどめの一球",desc:"ラリー6球目以降、対象技術の返球速度+2。相手が返球に成功すると次の自分の返球成功レベル◆−2（1打のみ）。"},
- feint:{name:"フェイント",desc:"相手の次の返球成功レベル◆−1。返球判定1回で消費。"},
- knuckleMastery:{name:"ナックルの極意",desc:"この1球が無回転なら、相手の次の返球成功レベル◆−2。返球判定1回で消費。"}
+ focus:{suitableType:"守備",name:"集中",desc:"この1球の成功レベル◆+1。"},
+ power:{suitableType:"攻撃",name:"強打",desc:"返球速度+1。相手が返球に成功すると次の自分の返球成功レベル◆−1（1打のみ）。"},
+ third:{suitableType:"攻撃",name:"3球目攻撃",desc:"3球目で使うと成功レベル◆+1、返球速度+1。"},
+ desperation:{suitableType:"両方",name:"背水の陣",desc:"相手にリードされていると成功レベル◆+1。"},
+ whiff:{suitableType:"両方",name:"空振り",desc:"効果なし。"},
+ counter:{suitableType:"両方",name:"カウンター",desc:"選択技術の適正速度+2。実際の返球速度は変化しない。"},
+ finisher:{suitableType:"攻撃",name:"とどめの一球",desc:"ラリー6球目以降、対象技術の返球速度+2。相手が返球に成功すると次の自分の返球成功レベル◆−2（1打のみ）。"},
+ feint:{suitableType:"両方",name:"フェイント",desc:"相手の次の返球成功レベル◆−1。返球判定1回で消費。"},
+ knuckleMastery:{suitableType:"両方",name:"ナックルの極意",desc:"この1球が無回転なら、相手の次の返球成功レベル◆−2。返球判定1回で消費。"}
 };
 
 const state={
@@ -336,7 +336,7 @@ const state={
  card:null,
  ball:{spin:"下",spinLevel:1,power:1,course:"B",length:"ショート",},
  pointBalls:0,playerLast:null,enemyLast:null,pendingHistory:null,rallyArrows:[],enemyReturnCount:0,
- finisherPending:false,finisherRecoil:false,feintPending:false,knucklePending:false,
+ finisherPending:false,finisherRecoil:false,powerPending:false,powerRecoil:false,feintPending:false,knucklePending:false,
  aiError:null,aiRecoveryAttempts:0,aiResumeAtLimitUsed:false,enemyHitToken:0,
  selectedServe:null,selectedServeCourse:null,selectedShot:null,
  lastPointResult:null,overworkUpgrades:null,matchFinished:false,history:{},log:[],upgradedTechs:[],upgradedServes:[],equipment:{carbon:false,sticky:false,shoes:false},eventCandidates:[],eventOptions:[],eventMode:null,eventDone:false,eventRerolling:false,specialCardsGained:[],restBonusMatch:null
@@ -468,7 +468,7 @@ function serverIsPlayerNow(){
 
 function pointReset(){
   state.aiError=null;state.aiRecoveryAttempts=0;state.aiResumeAtLimitUsed=false;state.enemyHitToken++;
-  state.finisherPending=false;state.finisherRecoil=false;state.feintPending=false;state.knucklePending=false;
+  state.finisherPending=false;state.finisherRecoil=false;state.powerPending=false;state.powerRecoil=false;state.feintPending=false;state.knucklePending=false;
   drawHand(); state.pointBalls=0;state.playerLast=null;state.enemyLast=null;state.pendingHistory=null;state.rallyArrows=[];resetEnemyReturnState();
   state.ball={spin:"下",spinLevel:1,power:1,course:"B",length:"ショート",};
   state.phase="serve";state.selectedServe=null;state.selectedServeCourse=null;state.selectedShot=null;
@@ -809,12 +809,12 @@ function renderPlayer(){
   const tbox=$("tech");tbox.innerHTML="";tbox.className="cards";
   state.learned.forEach(id=>{
     const t=TECHS[id],b=document.createElement("button");
-    const blocked=false;
+    const blocked=!!state.card&&!cardIsValidForTechnique(state.card,id);
     b.className="card text-card"+(shot&&shot.id===id?" selected":"");
     b.disabled=blocked;
     b.dataset.tech=id;
     b.setAttribute("aria-label",techName(id)+"を選択");
-    b.innerHTML="<span class=\"card-stamp\">"+(blocked?"使用不可":shot&&shot.id===id?"選択中":"選択")+"</span><span class=\"card-art\" aria-hidden=\"true\">"+(id==="backDrive"||id==="foreDrive"?"↗":id==="foreBlock"||id==="backBlock"?"▤":id==="foreSmash"?"‼":id==="foreFlick"||id==="backFlick"?"↗":"↘")+"</span><span class=\"card-name\">"+techName(id)+"</span><span class=\"card-description\">基本◆"+LITE_BASE_LEVELS[id]+"（"+LITE_SUCCESS_RATES[LITE_BASE_LEVELS[id]]+"%）"+shotQualityPreview(id)+"</span>";
+    b.innerHTML="<span class=\"card-stamp\">"+(blocked?"使用不可":shot&&shot.id===id?"選択中":"選択")+"</span><span class=\"card-art\" aria-hidden=\"true\">"+(id==="backDrive"||id==="foreDrive"?"↗":id==="foreBlock"||id==="backBlock"?"▤":id==="foreSmash"?"‼":id==="foreFlick"||id==="backFlick"?"↗":"↘")+"</span><span class=\"card-name\">"+techName(id)+"</span><span class=\"card-description\">タイプ："+t.type+" ／ 基本◆"+LITE_BASE_LEVELS[id]+"（"+LITE_SUCCESS_RATES[LITE_BASE_LEVELS[id]]+"%）"+shotQualityPreview(id)+"</span>";
     b.onclick=()=>chooseTech(id);tbox.appendChild(b);
   });
   $("techDetail").innerHTML=shot&&shot.id?shotQualityDetail(shot.id):"技術を選ぶと詳しい返球情報を表示します。↻ 上回転／↺ 下回転／○ 無回転／⚡ 速度";
@@ -822,7 +822,7 @@ function renderPlayer(){
   state.hand.forEach((id,i)=>{
     const c=CARDS[id],b=document.createElement("button");b.className="card text-card"+(state.card===id?" selected":"");
     b.disabled=!!state.card;
-    b.innerHTML="<span class=\"card-stamp\">"+(state.card===id?"使用済み":"選択")+"</span><span class=\"card-art\" aria-hidden=\"true\">"+(id==="focus"?"＋":id==="power"?"‼":id==="third"?"03":id==="counter"?"↻":id==="finisher"?"決":id==="feint"?"幻":"逆")+"</span><span class=\"card-name\">"+c.name+"</span><span class=\"card-description\">"+c.desc+(state.card===id?"<br>使用済み":"")+"</span>";
+    b.innerHTML="<span class=\"card-stamp\">"+(state.card===id?"使用済み":"選択")+"</span><span class=\"card-art\" aria-hidden=\"true\">"+(id==="focus"?"＋":id==="power"?"‼":id==="third"?"03":id==="counter"?"↻":id==="finisher"?"決":id==="feint"?"幻":"逆")+"</span><span class=\"card-name\">"+c.name+"</span><span class=\"card-description\">適正："+c.suitableType+" ／ "+c.desc+(state.card===id?"<br>使用済み":"")+"</span>";
     b.onclick=()=>useCard(i);cbox.appendChild(b);
   });
   const discard=document.createElement("button");discard.type="button";discard.className="card text-card";
@@ -1069,6 +1069,7 @@ function enemyHit(token){
   if(!returned){state.aiError=null;state.aiRecoveryAttempts=0;state.aiResumeAtLimitUsed=false;addLog("相手のレシーブ失敗。自分の得点。");state.my++;returnPoint("win");return}
   state.aiError=null;state.aiRecoveryAttempts=0;state.aiResumeAtLimitUsed=false;
   if(state.finisherPending){state.finisherPending=false;state.finisherRecoil=true;addLog("とどめの一球の反動：次の返球成功レベル◆−2。");}
+  if(state.powerPending){state.powerPending=false;state.powerRecoil=true;addLog("強打の反動：次の返球成功レベル◆−1。");}
   registerEnemyReturn(o.id);
   recordHistory(state.pendingHistory,{actor:"enemy",name:o.t.name});
   state.enemyLast={course:enemyPosition,strokeSide:actualStrokeSide(o.t,enemyPosition),techId:o.id};state.pointBalls++;
@@ -1155,6 +1156,8 @@ function enemyPower(id,b){
 function enemyLength(id){return id==="stop"?"ショート":"ロング"}
 
 function cardAllowsTechnique(card,id){
+  if(!TECHS[id]||!CARDS[card])return false;
+  if(CARDS[card].suitableType!=="両方"&&CARDS[card].suitableType!==TECHS[id].type)return false;
   if(card==="knuckleMastery")return !!TECHS[id]&&playerSpin(id)==="無";
   if(card==="counter")return !!TECHS[id]&&(Number.isFinite(TECHS[id].idealPower)||Array.isArray(TECHS[id].idealPowers)&&TECHS[id].idealPowers.some(Number.isFinite));
   if(card!=="power"&&card!=="third"&&card!=="finisher")return true;
@@ -1232,7 +1235,7 @@ function playerModifiers(t,b,foot,card,strokeSide,targetCourse){
   const add=(label,value)=>{if(value)modifiers.push({label,value});};
   if(state.equipment.sticky&&playerSpin(id)!=="無")add("粘着ラバー",1);
   if(card==="focus")add("集中カード",1);
-  if(card==="power"&&cardIsValidForTechnique(card,id))add("強打カード",-1);
+  
   if(card==="third"&&cardIsValidForTechnique(card,id))add("3球目攻撃カード",1);
   if(card==="desperation"&&state.enemy>state.my)add("背水の陣カード",1);
   return modifiers;
@@ -1248,6 +1251,7 @@ function playerSuccessBreakdown(t,b,foot,card,strokeSide,targetCourse){
   add("技術強化",techIsUpgraded(id)&&["backFlick","stop"].includes(id)?1:0);
   modifiers.push(...playerModifiers(t,b,foot,card,strokeSide,targetCourse));
   if(state.finisherRecoil)add("とどめの一球の反動",-2);
+  if(state.powerRecoil)add("強打の反動",-1);
   const result=liteSuccessBreakdown(LITE_BASE_LEVELS[id],modifiers);
   return {fixed:false,base:result.baseLevel,modifiers,raw:result.rawLevel,level:result.level,rate:result.rate};
 }
@@ -1272,9 +1276,11 @@ function resolvePlayerShot(){
   const t=TECHS[shot.id],card=state.card;
   const shotReturned=hit(shot.success);
   if(state.finisherRecoil)state.finisherRecoil=false;
+  if(state.powerRecoil)state.powerRecoil=false;
   if(!shotReturned){addLog("自分："+t.name+"失敗（"+Math.round(shot.success)+"%）。相手の得点。");state.selectedShot=null;state.enemy++;returnPoint("lose");return}
   addLog("自分："+t.name+"成功（"+Math.round(shot.success)+"%）。");
   state.finisherPending=card==="finisher";
+  state.powerPending=card==="power";
   state.feintPending=card==="feint";
   state.knucklePending=card==="knuckleMastery"&&playerSpin(shot.id)==="無";
   state.playerLast={course:shot.ball.course,strokeSide:shot.strokeSide,techId:shot.id};state.pointBalls++;
