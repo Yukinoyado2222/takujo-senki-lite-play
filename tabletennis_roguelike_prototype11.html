@@ -902,7 +902,8 @@ function renderPlayer(){
     note.textContent=techName(shot.id)+"を選択中。下のボタンでコースを選んでください。";
     actions.appendChild(note);
   }else if(shot&&shot.step==="preview"){
-    actions.innerHTML="<div class=success-action-row><div class=success-rate-label>最終成功率 <strong>"+shot.success+"%</strong></div><button type=button class=\"btn success-detail-button\" aria-expanded=\"false\">詳細</button><button type=button class=\"btn success-return-button\">返球</button></div><div class=success-details-content hidden>"+calculationHTML(shot)+"</div>";
+    const successLevel=playerSuccessBreakdown(TECHS[shot.id],shot.ball,shot.footwork,state.card,shot.strokeSide,shot.course).level;
+    actions.innerHTML="<div class=success-action-row><div class=success-rate-label>最終成功率 <strong>◆"+successLevel+"（"+shot.success+"%）</strong></div><button type=button class=\"btn success-detail-button\" aria-expanded=\"false\">詳細</button><button type=button class=\"btn success-return-button\">返球</button></div><div class=success-details-content hidden>"+calculationHTML(shot)+"</div>";
     actions.querySelector(".success-detail-button").onclick=()=>{const panel=actions.querySelector(".success-details-content"),button=actions.querySelector(".success-detail-button");panel.hidden=!panel.hidden;button.setAttribute("aria-expanded",String(!panel.hidden));};
     actions.querySelector(".success-return-button").onclick=()=>resolvePlayerShot();
   }
