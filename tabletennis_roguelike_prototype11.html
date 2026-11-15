@@ -672,7 +672,7 @@ function render(){
   if(state.phase==="serve"&&activeCardCategory!=="serve")activeCardCategory="serve";
   if(state.phase==="player"&&activeCardCategory==="serve")activeCardCategory="return";
   syncCardCategories();
-  $("growthPanel").classList.toggle("hidden",state.phase!=="growth"||(state.view!=="progress"&&state.view!=="result"));
+  $("growthPanel").classList.toggle("hidden",!(state.phase==="growth"||state.phase==="preparation")||(state.view!=="progress"&&state.view!=="result"));
   if(state.phase==="serve"&&activeCardCategory!=="serve")activeCardCategory="serve";
   if(state.phase==="player"&&activeCardCategory==="serve")activeCardCategory="return";
   syncCardCategories();
