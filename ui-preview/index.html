@@ -798,6 +798,27 @@ function shotQualityPreview(id){
   return "<span class='shot-quality' aria-hidden='true'>"+spinIcon+(spin==="無"?"":"★"+level)+" ⚡"+power+"</span>"+
     (flags.length?"<span class='shot-modifiers' aria-hidden='true'>"+flags.join(" ")+"</span>":"");
 }
+// Presentation-only labels; never used in scoring.
+function liteIdealBallLabel(id){
+  const t=TECHS[id],spins=(techIsUpgraded(id)&&t.idealSpinsPlus)||t.idealSpins||[t.idealSpin];
+  const lengths=(techIsUpgraded(id)&&t.idealLengthPlus)||[t.idealLength];
+  return "適正回転 "+spins.map(v=>v==="無"?"○無":v.startsWith("上")?"↻"+v.slice(1):"↺"+v.slice(1)).join("・")+" ／ 速度 "+idealPowerDisplay(t,state.card)+" ／ 長さ "+lengths.join("・");
+}
+// Preview the exact power used after resolvePlayerShot increments pointBalls.
+// Read-only: no temporary state mutation, RNG, or change to playerPower rules.
+function litePreviewPower(id){
+  const card=state.card;
+  const power=playerPower(id,state.ball,card);
+  if(card!=="third"&&card!=="finisher")return power;
+  const before=cardIsValidForTechnique(card,id,state.pointBalls-1);
+  const after=cardIsValidForTechnique(card,id,state.pointBalls);
+  const bonus=card==="third"?1:2;
+  return power+(after&&!before?bonus:0)-(before&&!after?bonus:0);
+}
+function liteOutgoingBallLabel(id){
+  const spin=playerSpin(id),level=techIsUpgraded(id)&&["foreDrive","foreCut"].includes(id)?2:1;
+  return "返球予定：回転 "+(spin==="無"?"○無":(spin==="上"?"↻":"↺")+level)+" ／ 速度 ⚡"+litePreviewPower(id)+" ／ 長さ "+(TECHS[id].outputLength||"ロング");
+}
 function shotQualityDetail(id){
   const t=TECHS[id],spin=playerSpin(id),level=techIsUpgraded(id)&&["foreDrive","foreCut"].includes(id)?2:1;
   const changes=[];
@@ -809,8 +830,8 @@ function shotQualityDetail(id){
   }
   if(state.card&&cardIsValidForTechnique(state.card,id))changes.push("札 カード："+CARDS[state.card].name);
   return "<strong>"+techName(id)+"</strong>　"+(t.side==="F"?"フォア面":t.side==="B"?"バック面":"両面")+
-    "／基本◆"+LITE_BASE_LEVELS[id]+"（"+LITE_SUCCESS_RATES[LITE_BASE_LEVELS[id]]+"%）　"+t.desc+"<div>↻ 上回転／↺ 下回転／○ 無回転／⚡ 速度</div>"+
-    "<div>返球："+(spin==="無"?"無回転":(spin==="上"?"上回転★":"下回転★")+level)+" ／ 速度★"+playerPower(id,state.ball,state.card)+"</div>"+
+    "／基本◆"+LITE_BASE_LEVELS[id]+"（"+LITE_SUCCESS_RATES[LITE_BASE_LEVELS[id]]+"%）　"+t.desc+"<div class=lite-ideal-summary>"+liteIdealBallLabel(id)+"</div>"+
+    "<div class=lite-outgoing-summary>"+liteOutgoingBallLabel(id)+"</div>"+
     (changes.length?"<div>"+changes.join("・")+"</div>":"");
 }
 function renderEquipmentPanel(){
@@ -850,7 +871,7 @@ function renderPlayer(){
     b.disabled=blocked;
     b.dataset.tech=id;
     b.setAttribute("aria-label",techName(id)+"を選択");
-    b.innerHTML="<span class=\"card-stamp\">"+(blocked?"使用不可":shot&&shot.id===id?"選択中":"選択")+"</span><span class=\"card-art\" aria-hidden=\"true\">"+(id==="backDrive"||id==="foreDrive"?"↗":id==="foreBlock"||id==="backBlock"?"▤":id==="foreSmash"?"‼":id==="foreFlick"||id==="backFlick"?"↗":"↘")+"</span><span class=\"card-name\">"+techName(id)+"</span><span class=\"card-description\">タイプ："+t.type+" ／ 基本◆"+LITE_BASE_LEVELS[id]+"（"+LITE_SUCCESS_RATES[LITE_BASE_LEVELS[id]]+"%）"+shotQualityPreview(id)+"</span>";
+    b.innerHTML="<span class=\"card-stamp\">"+(blocked?"使用不可":shot&&shot.id===id?"選択中":"選択")+"</span><span class=\"card-art\" aria-hidden=\"true\">"+(id==="backDrive"||id==="foreDrive"?"↗":id==="foreBlock"||id==="backBlock"?"▤":id==="foreSmash"?"‼":id==="foreFlick"||id==="backFlick"?"↗":"↘")+"</span><span class=\"card-name\">"+techName(id)+"</span><span class=\"card-description\">タイプ："+t.type+"<span class=lite-ideal-on-card>"+liteIdealBallLabel(id)+"</span>"+"</span>";
     b.onclick=()=>chooseTech(id);tbox.appendChild(b);
   });
   $("techDetail").innerHTML=shot&&shot.id?shotQualityDetail(shot.id):"技術を選ぶと詳しい返球情報を表示します。↻ 上回転／↺ 下回転／○ 無回転／⚡ 速度";

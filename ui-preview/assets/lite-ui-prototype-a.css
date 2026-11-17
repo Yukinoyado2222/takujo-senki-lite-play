@@ -60,3 +60,14 @@ h1,h2,.score,.big{color:#f0f8ff}
  #serve .card,#tech .card{flex-basis:clamp(106px,calc((100vw - 34px)/2.55),142px)}
  .card-name{font-size:11px}
 }
+
+/* Prototype B: technique ideals and outgoing-ball detail. */
+#tech .card-description{font-size:clamp(10px,2.6vw,12px);line-height:1.35}
+#tech .lite-ideal-on-card{display:block;margin-top:5px;color:#b8dbe9;font-weight:500}
+#techDetail{padding:12px 13px;line-height:1.65}
+#techDetail .lite-ideal-summary{color:#9edeee;font-size:.93em;margin-top:4px}
+#techDetail .lite-outgoing-summary{color:#f4f8ff;font-weight:700;margin-top:4px}
+#playerCourseControls{margin-top:10px}
+#shotActions .success-rate-label strong{color:#7ee7a8}
+#shotActions .success-detail-button,#shotActions .success-return-button{min-height:44px}
+#shotActions .success-return-button{background:#123e55;border-color:#00d9f5}
