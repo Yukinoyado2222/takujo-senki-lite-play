@@ -1,0 +1,62 @@
+/* 卓上戦記Lite UI prototype A — visual-only overrides.
+   Placeholder illustrations remain the existing per-technique glyphs.
+   No gameplay state, event handlers or RNG are changed. */
+:root{
+  color-scheme:dark;
+  --ink:#e9f5ff;--paper:#101f34;--ash:#162b44;--red:#00d9f5;
+  --lite-bg:#081525;--lite-panel:#102239;--lite-line:#2c6178;
+  --lite-cyan:#00d9f5;--lite-gold:#f4c84b;--lite-muted:#a9bed0;
+}
+html,body{background:var(--lite-bg);color:var(--ink)}
+.panel{background:var(--lite-panel);border:1px solid var(--lite-line);border-radius:12px;box-shadow:none;color:var(--ink)}
+h1,h2,.score,.big{color:#f0f8ff}
+.sub,.hint{color:var(--lite-muted)}
+.phase,.badge{background:#19334c;border:1px solid var(--lite-line);border-radius:8px;color:#e9f5ff}
+.btn,.tab,.course-button,.nav-button,.equipment-trigger{
+  background:#142c46;color:#e9f5ff;border:1px solid #39829a;border-radius:9px;box-shadow:none
+}
+.btn:active,.course-button:active{box-shadow:none}
+.btn:disabled,.tab:disabled,.course-button:disabled{background:#17283a;color:#8395a5;border-color:#355064;box-shadow:none;opacity:.7}
+.selected,.btn.selected,.tab[aria-pressed="true"]{outline:2px solid var(--lite-gold);outline-offset:0;background:#283447}
+.info,.calculation,#techDetail{background:#122b43;color:#e9f5ff;border:1px solid #39768d;border-radius:9px}
+.notice{background:#102d43;color:#d7f4ff;border:1px solid #39768d;border-left:4px solid var(--lite-cyan);border-radius:9px}
+.log{background:#06101c;color:#d8e9f4;border:1px solid #24465c}
+.log div,.row{border-bottom-color:#2b455b}
+.table{background:#0b2c42;border:2px solid var(--lite-cyan);border-radius:10px;box-shadow:inset 0 0 18px #00d9f51c}
+.court-grid{opacity:.58;background-image:linear-gradient(to right,transparent calc(12.5% - .5px),#00d9f533 12.5%,transparent calc(12.5% + .5px)),linear-gradient(to bottom,transparent calc(25% - .5px),#00d9f533 25%,transparent calc(25% + .5px))}
+.net{background:#8eeeff}.rally-arrows .player-arrow{stroke:#8296a9}.rally-arrows .enemy-arrow{stroke:#00d9f5}
+.ball{background:#fff;border:2px solid #b6f5ff;box-shadow:0 0 8px #aaf4ff99}
+.ball-label{background:#102b43;color:#fff;border:1px solid #2b718c;border-radius:7px}
+.card,.tech-card{
+  background:#10283f;color:#edf7ff;border:1.5px solid #39819b;
+  border-radius:10px;box-shadow:none;aspect-ratio:1/1.4
+}
+.card.selected,.tech-card.selected{
+  background:#253346;border:3px solid var(--lite-gold);
+  outline:none;box-shadow:0 0 0 1px #f4c84b44;transform:none
+}
+.card:disabled,.tech-card:disabled{box-shadow:none;opacity:.65}
+.card-stamp,.tech-card-live{background:#193c55;color:#e6f7ff;border:1px solid #428da6;border-radius:5px;box-shadow:none}
+.card.selected .card-stamp{background:var(--lite-gold);color:#142033;border-color:var(--lite-gold)}
+.card-art{
+  height:40%;flex:0 0 40%;min-height:0;
+  background:radial-gradient(circle at 50% 43%,#225d7d 0%,#102a45 64%,#0a1e33 100%);
+  border-bottom:1px solid #3b849a;color:#c5f6ff;
+  font-size:clamp(25px,8vw,38px);text-shadow:0 0 10px #00d9f566
+}
+.card img{height:40%;object-fit:cover;border-bottom:1px solid #3b849a}
+#tech .card-art,#tech .card img{height:40%;flex:0 0 40%}
+.card-name{color:#f0f7ff}.card-description,.card-rate{color:#c1d5e3}
+.cards-viewport{scroll-padding-inline:2px}
+.cards{gap:9px}
+#serve .card,#tech .card{flex-basis:clamp(110px,calc((min(100vw,496px) - 44px)/2.55),164px)}
+.course-button{min-height:46px}
+.course-button:not(:disabled):focus-visible,.card:focus-visible,.btn:focus-visible{outline:3px solid var(--lite-gold);outline-offset:2px}
+.gp-shortage,.ai-error-panel h2{color:#ff9ba9}
+.ai-error-panel{background:#352331;border-color:#f08c9e}
+.equipment-popover{background:#11263b;color:#e9f5ff;border-color:#43839d}
+.equipment-tag{background:#1a3850;color:#e9f5ff;border-color:#42839c}
+@media(max-width:380px){
+ #serve .card,#tech .card{flex-basis:clamp(106px,calc((100vw - 34px)/2.55),142px)}
+ .card-name{font-size:11px}
+}
