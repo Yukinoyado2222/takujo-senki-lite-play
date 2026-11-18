@@ -189,7 +189,7 @@ body.is-match-view .topbar{margin:0 0 2px}
 .lite-title-content{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:clamp(18px,7vw,48px) 10px}.lite-title-logo{display:block;width:min(100%,520px);height:auto;max-height:240px;object-fit:contain}.lite-title-content h1{font-size:clamp(25px,7vw,40px);margin:0;font-weight:900}.lite-title-content .screen-intro{margin:0;max-width:34em}.lite-title-start{width:min(100%,360px);min-height:60px;text-align:center;font-size:24px;font-weight:900;background:var(--red);color:#fff}.lite-title-new-run{width:min(100%,360px);text-align:center;font-weight:800}.lite-title-new-run[hidden]{display:none!important}
 body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #viewNav{display:none}
 </style>
-<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=c2a-rally-flight">
+<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=c2a-rally-flight-a">
 </head>
 <body><div id="app">
 <img class="title-logo" src="./assets/cards/title_logo.jpeg" alt="卓上戦記"><div class="topbar"><span id="phase" class="phase"></span></div>
@@ -985,8 +985,8 @@ function renderBall(){
 }
 // Presentation observes recorded hits. The game still owns its timers and results.
 function createRallyFlight({courtPoint, now, requestFrame, cancelFrame, lock, paint}) {
-  const flightMs = 300;
-  const landingMs = 200;
+  const flightMs = 500;
+  const landingMs = 250;
   let lastArrows, lastGeneration, lastHit;
   let phase, flight, queued, landing, frame;
   let locked = false;
@@ -1013,7 +1013,8 @@ function createRallyFlight({courtPoint, now, requestFrame, cancelFrame, lock, pa
   }
 
   function tick(time) {
-    if (flight && time >= flight.start + flightMs) {
+    // A late frame can cross both the outbound and queued return flights.
+    while (flight && time >= flight.start + flightMs) {
       const end = flight.start + flightMs;
       landing = {point: flight.to, time: end};
       flight = undefined;
@@ -1108,7 +1109,7 @@ function syncRallyFlight() {
 
         place(ball, sample(progress));
         trail.forEach((dot, index) => {
-          const fraction = progress - (index + 1) * 0.045;
+          const fraction = progress - (index + 1) * 0.06;
           dot.hidden = !flight || fraction <= 0;
           if (!dot.hidden) place(dot, sample(fraction));
         });
