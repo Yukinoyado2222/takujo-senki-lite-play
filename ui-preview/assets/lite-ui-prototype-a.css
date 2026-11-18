@@ -116,4 +116,49 @@ body.is-match-view #matchView .table.lite-perspective-table{margin:30px 0 23px}
 /* C-1 ball-name row: separate from the court and F/B markers. */
 #matchView .lite-ball-name-row{order:-1;box-sizing:border-box;margin:12px 0 0;padding:8px 12px;width:100%;border:1px solid #377b94;border-radius:7px;background:#112b40;color:#e7faff;font-size:13px;font-weight:600;line-height:1.5;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
 #matchView .lite-ball-name-row[hidden]{display:none!important}
-body.is-match-view #matchView .lite-ball-name-row:not([hidden])+.table.lite-perspective-table{margin-top:12px}
+body.is-match-view #matchView:not(.lite-rally-active) .lite-ball-name-row:not([hidden])+.table.lite-perspective-table{margin-top:12px}
+
+/* C-2a rally flight, layered over the same court coordinate space. */
+#rallyArrowLayer .player-arrow { stroke: #aeb8c2; stroke-opacity: .55; }
+#rallyArrowLayer .enemy-arrow { stroke: #00e5ff; }
+#arrow-gray path { fill: #aeb8c2; opacity: .55; }
+#arrow-black path { fill: #00e5ff; }
+
+body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
+  height: clamp(188px, 35vh, 280px);
+  height: clamp(188px, 35svh, 280px);
+  flex-shrink: 0;
+  margin-top: 30px;
+}
+#matchView.lite-rally-active :is(#servePanel, #playerPanel, #ballLabel) { display: none !important; }
+#matchView.lite-rally-active :is(#ball, #landingMarker) { visibility: hidden; }
+.lite-rally-flight { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+.lite-rally-flight [hidden], .lite-rally-flight[hidden] { display: none !important; }
+.lite-rally-flight span {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.lite-flight-ball {
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border: 2px solid #b6f5ff;
+  box-shadow: 0 0 8px #aaf4ff;
+}
+.lite-flight-trail {
+  width: 9px;
+  height: 9px;
+  background: #7ef8ff;
+  box-shadow: 0 0 8px #39e7ff;
+  opacity: .58;
+}
+.lite-flight-trail:nth-child(3) { width: 7px; height: 7px; opacity: .38; }
+.lite-flight-trail:nth-child(4) { width: 5px; height: 5px; opacity: .22; }
+.lite-flight-glow {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #b9fcff;
+  box-shadow: 0 0 9px 3px #5ae9ff;
+  opacity: 0;
+}
