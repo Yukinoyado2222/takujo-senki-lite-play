@@ -71,3 +71,16 @@ h1,h2,.score,.big{color:#f0f8ff}
 #shotActions .success-rate-label strong{color:#7ee7a8}
 #shotActions .success-detail-button,#shotActions .success-return-button{min-height:44px}
 #shotActions .success-return-button{background:#123e55;border-color:#00d9f5}
+
+/* C-1: perspective court and incoming landing marker; visual only. */
+.lite-perspective-table{background:transparent!important;border:0!important;overflow:visible!important;isolation:isolate}
+.lite-table-surface{position:absolute;inset:0;width:100%;height:100%;z-index:0;overflow:visible;filter:drop-shadow(0 0 4px #00d9f566)}
+.lite-table-surface polygon{fill:#0b2c42;stroke:#00d9f5;stroke-width:.65;vector-effect:non-scaling-stroke}
+.lite-table-surface path{fill:none;stroke:#73ddeb;stroke-width:.55;vector-effect:non-scaling-stroke;opacity:.75}
+.lite-perspective-table .net,.lite-perspective-table .court-grid{display:none}
+.lite-perspective-table .player{top:auto;bottom:0;left:50%;transform:translateX(-50%);font-size:10px}
+.lite-perspective-table .enemy{top:0;right:auto;left:50%;transform:translateX(-50%);font-size:10px}
+.lite-landing-marker{position:absolute;width:24px;height:24px;margin:-12px;border:1.5px solid #fff;border-radius:50%;box-shadow:0 0 0 5px #8cefff35,0 0 13px #7cf1ff88;z-index:4;pointer-events:none}
+.lite-landing-marker:after{content:"";position:absolute;inset:6px;border:1.5px solid #fff;border-radius:50%}
+.lite-landing-marker[hidden]{display:none!important}
+.lite-perspective-table .ball{z-index:6}
