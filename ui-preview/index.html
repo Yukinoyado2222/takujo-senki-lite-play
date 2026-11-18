@@ -211,7 +211,7 @@ body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #vi
 </div>
 </div>
 
-<div class="table"><div class="court-grid"></div><svg id="rallyArrows" class="rally-arrows" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="arrow-gray" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8a8a8a"></path></marker><marker id="arrow-black" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#171717"></path></marker></defs><g id="rallyArrowLayer"></g></svg><div class="net"></div><div class="player">自分<br><span class="sub">右利き</span></div><div class="enemy">相手<br><span class="sub">右利き</span></div><div id="ball" class="ball"></div><div id="ballLabel" class="ball-label"></div></div>
+<div class="table lite-perspective-table"><svg class="lite-table-surface" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="33,12 67,12 90,88 10,88"/><path d="M50 12V88 M21.5 50H78.5"/></svg><svg id="rallyArrows" class="rally-arrows" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="arrow-gray" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8a8a8a"></path></marker><marker id="arrow-black" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#171717"></path></marker></defs><g id="rallyArrowLayer"></g></svg><div class="net"></div><div class="player">自分<br><span class="sub">右利き</span></div><div class="enemy">相手<br><span class="sub">右利き</span></div><div id="landingMarker" class="lite-landing-marker" aria-hidden="true"></div><div id="ball" class="ball"></div><div id="ballLabel" class="ball-label"></div></div>
 
 <div id="servePanel" class="panel"><div class="category-tabs core-tabs" role="group" aria-label="カード分類"><button type="button" class="tab" data-card-category="serve" aria-pressed="true">サーブ</button><button type="button" class="tab" data-card-category="return" aria-pressed="false">スキル</button><button type="button" class="tab" data-card-category="skill" aria-pressed="false">スペシャル</button></div><div class="notice">初期位置はバック側。フォア面でサーブ。サーブカードが回転・長さ・速度を決めます。</div><div id="serve" class="cards-viewport" style="margin-top:8px"><div class="cards"></div></div><section id="serveSpecialCategory" hidden><h2 style="margin-top:10px">スペシャルカード（確認のみ・サーブ時は使用不可）</h2><div id="serveSpecialCards" class="cards-viewport"><div class="cards"></div></div></section><div id="serveCourseControls" class="course-controls"><button type="button" class="course-button" data-serve-course="F" disabled>フォアへサーブ</button><button type="button" class="course-button" data-serve-course="B" disabled>バックへサーブ</button></div></div>
 
@@ -939,10 +939,16 @@ function renderPlayer(){
   });
 }
 
+// Presentation-only perspective mapping. Preserve the existing logical court coordinates.
+function litePerspectivePoint(x,y){
+  const depth=1-x/100;
+  const halfWidth=17+23*depth;
+  return {x:50+(y-50)/50*halfWidth,y:12+76*depth};
+}
 function courtPoint(side,course,length){
   const x=side==="player"?(length==="ロング"?6.25:43.75):(length==="ロング"?93.75:56.25);
   const y=side==="player"?(course==="F"?75:25):(course==="F"?25:75);
-  return {x,y};
+  return litePerspectivePoint(x,y);
 }
 function renderRallyArrows(){
   const layer=$("rallyArrowLayer");if(!layer)return;
@@ -960,10 +966,12 @@ function renderRallyArrows(){
 function addRallyArrow(actor,fromSide,fromCourse,fromLength,toSide,toCourse,toLength){state.rallyArrows.push({actor,fromSide,fromCourse,fromLength,toSide,toCourse,toLength});}
 function renderBall(){
   const ball=$("ball");
+  const marker=$("landingMarker");if(marker)marker.hidden=state.phase!=="player";
   if(state.phase==="serve"){
     const p=courtPoint("player","B","ロング");ball.style.left=p.x+"%";ball.style.top=p.y+"%";ball.className="ball";$("ballLabel").textContent="";renderRallyArrows();return;
   }
-  const receiver=state.phase==="player"?"player":"enemy",p=courtPoint(receiver,state.ball.course,state.ball.length);ball.style.left=p.x+"%";ball.style.top=p.y+"%";ball.className="ball";const lastEnemy=state.enemyLast&&(TECHS[state.enemyLast.techId]||SERVES[state.enemyLast.techId]);$("ballLabel").textContent=state.phase==="player"?((lastEnemy?lastEnemy.name:"")):(state.phase==="serve"?"":"");renderRallyArrows();
+  const receiver=state.phase==="player"?"player":"enemy",p=courtPoint(receiver,state.ball.course,state.ball.length);
+  if(marker&&state.phase==="player"){marker.style.left=p.x+"%";marker.style.top=p.y+"%";}ball.style.left=p.x+"%";ball.style.top=p.y+"%";ball.className="ball";const lastEnemy=state.enemyLast&&(TECHS[state.enemyLast.techId]||SERVES[state.enemyLast.techId]);$("ballLabel").textContent=state.phase==="player"?((lastEnemy?lastEnemy.name:"")):(state.phase==="serve"?"":"");renderRallyArrows();
 }
 function renderHistory(){
   const rows=Object.entries(state.history);
