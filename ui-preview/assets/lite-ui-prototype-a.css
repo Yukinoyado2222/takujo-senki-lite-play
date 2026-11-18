@@ -112,3 +112,8 @@ body.is-match-view #matchView .table.lite-perspective-table{margin:30px 0 23px}
 .table.lite-perspective-table .lite-enemy-b{left:80%;top:20%}
 .table.lite-perspective-table .lite-player-b{left:3%;top:78%}
 .table.lite-perspective-table .lite-player-f{left:97%;top:78%}
+
+/* C-1 ball-name row: separate from the court and F/B markers. */
+#matchView .lite-ball-name-row{order:-1;box-sizing:border-box;margin:12px 0 0;padding:8px 12px;width:100%;border:1px solid #377b94;border-radius:7px;background:#112b40;color:#e7faff;font-size:13px;font-weight:600;line-height:1.5;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
+#matchView .lite-ball-name-row[hidden]{display:none!important}
+body.is-match-view #matchView .lite-ball-name-row:not([hidden])+.table.lite-perspective-table{margin-top:12px}
