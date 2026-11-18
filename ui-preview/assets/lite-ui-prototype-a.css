@@ -84,3 +84,19 @@ h1,h2,.score,.big{color:#f0f8ff}
 .lite-landing-marker:after{content:"";position:absolute;inset:6px;border:1.5px solid #fff;border-radius:50%}
 .lite-landing-marker[hidden]{display:none!important}
 .lite-perspective-table .ball{z-index:6}
+
+/* C-1 Safari visual correction: override legacy court and labels. */
+body.is-match-view #matchView .table.lite-perspective-table,.table.lite-perspective-table{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
+.table.lite-perspective-table .net,.table.lite-perspective-table .court-grid{display:none!important}
+.table.lite-perspective-table .lite-table-surface{display:block!important;position:absolute;inset:0;width:100%;height:100%;z-index:1;overflow:visible}
+.table.lite-perspective-table .lite-table-surface polygon{fill:#0b2c42!important;stroke:#00d9f5!important}
+.table.lite-perspective-table .lite-table-surface path{fill:none!important;stroke:#8ceeff!important}
+.table.lite-perspective-table .player,.table.lite-perspective-table .enemy{left:50%!important;right:auto!important;transform:translateX(-50%)!important;z-index:5;white-space:nowrap;font-size:11px;line-height:1.1}
+.table.lite-perspective-table .player{top:auto!important;bottom:-21px!important}
+.table.lite-perspective-table .enemy{top:-25px!important;bottom:auto!important}
+.table.lite-perspective-table .player .sub,.table.lite-perspective-table .enemy .sub{display:none}
+.table.lite-perspective-table .ball-label{left:auto!important;right:0!important;top:0!important;transform:none!important;max-width:30%;font-size:11px;padding:3px 5px;z-index:7}
+.table.lite-perspective-table .rally-arrows{z-index:3}
+.table.lite-perspective-table .lite-landing-marker{z-index:4}
+.table.lite-perspective-table .ball{z-index:6}
+body.is-match-view #matchView .table.lite-perspective-table{margin:30px 0 23px}
