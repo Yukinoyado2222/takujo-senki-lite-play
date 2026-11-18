@@ -189,7 +189,7 @@ body.is-match-view .topbar{margin:0 0 2px}
 .lite-title-content{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:clamp(18px,7vw,48px) 10px}.lite-title-logo{display:block;width:min(100%,520px);height:auto;max-height:240px;object-fit:contain}.lite-title-content h1{font-size:clamp(25px,7vw,40px);margin:0;font-weight:900}.lite-title-content .screen-intro{margin:0;max-width:34em}.lite-title-start{width:min(100%,360px);min-height:60px;text-align:center;font-size:24px;font-weight:900;background:var(--red);color:#fff}.lite-title-new-run{width:min(100%,360px);text-align:center;font-weight:800}.lite-title-new-run[hidden]{display:none!important}
 body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #viewNav{display:none}
 </style>
-<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=c1-ball-label-958cbb9">
+<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=c2a-rally-flight">
 </head>
 <body><div id="app">
 <img class="title-logo" src="./assets/cards/title_logo.jpeg" alt="卓上戦記"><div class="topbar"><span id="phase" class="phase"></span></div>
@@ -212,7 +212,14 @@ body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #vi
 </div>
 
 <div id="ballLabel" class="lite-ball-name-row" hidden aria-live="polite"></div>
-<div class="table lite-perspective-table"><svg class="lite-table-surface" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="33,12 67,12 90,88 10,88" fill="#0b2c42" stroke="#00d9f5" stroke-width=".7"/><path d="M25.3333 37.3333H74.6667" fill="none" stroke="#8ceeff" stroke-width=".9"/><path d="M50 12V88" fill="none" stroke="#73ddeb" stroke-width=".4" opacity=".4"/></svg><svg id="rallyArrows" class="rally-arrows" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="arrow-gray" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8a8a8a"></path></marker><marker id="arrow-black" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#171717"></path></marker></defs><g id="rallyArrowLayer"></g></svg><div class="net"></div><div class="lite-court-side-label lite-enemy-f" aria-label="相手フォア側">F</div><div class="lite-court-side-label lite-enemy-b" aria-label="相手バック側">B</div><div class="lite-court-side-label lite-player-b" aria-label="自分バック側">B</div><div class="lite-court-side-label lite-player-f" aria-label="自分フォア側">F</div><div id="landingMarker" class="lite-landing-marker" aria-hidden="true"></div><div id="ball" class="ball"></div></div>
+<div class="table lite-perspective-table"><svg class="lite-table-surface" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="33,12 67,12 90,88 10,88" fill="#0b2c42" stroke="#00d9f5" stroke-width=".7"/><path d="M25.3333 37.3333H74.6667" fill="none" stroke="#8ceeff" stroke-width=".9"/><path d="M50 12V88" fill="none" stroke="#73ddeb" stroke-width=".4" opacity=".4"/></svg><svg id="rallyArrows" class="rally-arrows" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="arrow-gray" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8a8a8a"></path></marker><marker id="arrow-black" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#171717"></path></marker></defs><g id="rallyArrowLayer"></g></svg><div class="net"></div><div class="lite-court-side-label lite-enemy-f" aria-label="相手フォア側">F</div><div class="lite-court-side-label lite-enemy-b" aria-label="相手バック側">B</div><div class="lite-court-side-label lite-player-b" aria-label="自分バック側">B</div><div class="lite-court-side-label lite-player-f" aria-label="自分フォア側">F</div><div id="landingMarker" class="lite-landing-marker" aria-hidden="true"></div><div id="ball" class="ball"></div>
+<div id="rallyFlight" class="lite-rally-flight" hidden aria-hidden="true">
+  <span class="lite-flight-glow"></span>
+  <span class="lite-flight-trail"></span>
+  <span class="lite-flight-trail"></span>
+  <span class="lite-flight-trail"></span>
+  <span class="lite-flight-ball"></span>
+</div></div>
 
 <div id="servePanel" class="panel"><div class="category-tabs core-tabs" role="group" aria-label="カード分類"><button type="button" class="tab" data-card-category="serve" aria-pressed="true">サーブ</button><button type="button" class="tab" data-card-category="return" aria-pressed="false">スキル</button><button type="button" class="tab" data-card-category="skill" aria-pressed="false">スペシャル</button></div><div class="notice">初期位置はバック側。フォア面でサーブ。サーブカードが回転・長さ・速度を決めます。</div><div id="serve" class="cards-viewport" style="margin-top:8px"><div class="cards"></div></div><section id="serveSpecialCategory" hidden><h2 style="margin-top:10px">スペシャルカード（確認のみ・サーブ時は使用不可）</h2><div id="serveSpecialCards" class="cards-viewport"><div class="cards"></div></div></section><div id="serveCourseControls" class="course-controls"><button type="button" class="course-button" data-serve-course="F" disabled>フォアへサーブ</button><button type="button" class="course-button" data-serve-course="B" disabled>バックへサーブ</button></div></div>
 
@@ -686,6 +693,7 @@ function render(){
   renderServe();
   renderPlayer();
   renderBall();
+  syncRallyFlight();
   renderHistory();
   renderLog();
   renderDevBossResult();
@@ -975,6 +983,144 @@ function renderBall(){
   const receiver=state.phase==="player"?"player":"enemy",p=courtPoint(receiver,state.ball.course,state.ball.length);
   if(marker&&state.phase==="player"){marker.style.left=p.x+"%";marker.style.top=p.y+"%";}ball.style.left=p.x+"%";ball.style.top=p.y+"%";ball.className="ball";const lastEnemy=state.enemyLast&&(TECHS[state.enemyLast.techId]||SERVES[state.enemyLast.techId]);const ballName=state.phase==="player"&&lastEnemy?lastEnemy.name:"";$("ballLabel").textContent=ballName?"相手の返球："+ballName:"";$("ballLabel").hidden=!ballName;renderRallyArrows();
 }
+// Presentation observes recorded hits. The game still owns its timers and results.
+function createRallyFlight({courtPoint, now, requestFrame, cancelFrame, lock, paint}) {
+  const flightMs = 300;
+  const landingMs = 200;
+  let lastArrows, lastGeneration, lastHit;
+  let phase, flight, queued, landing, frame;
+  let locked = false;
+
+  function stop() {
+    if (frame !== undefined) cancelFrame(frame);
+    frame = flight = queued = landing = undefined;
+    if (locked) {
+      locked = false;
+      lock(false);
+    }
+  }
+
+  function begin(hit, start) {
+    flight = {
+      start,
+      from: courtPoint(hit.fromSide, hit.fromCourse, hit.fromLength),
+      to: courtPoint(hit.toSide, hit.toCourse, hit.toLength)
+    };
+    if (!locked) {
+      locked = true;
+      lock(true);
+    }
+  }
+
+  function tick(time) {
+    if (flight && time >= flight.start + flightMs) {
+      const end = flight.start + flightMs;
+      landing = {point: flight.to, time: end};
+      flight = undefined;
+      if (queued) {
+        begin(queued.hit, Math.max(end, queued.time));
+        queued = undefined;
+      }
+    }
+
+    if (!flight && (!landing || time >= landing.time + landingMs) && phase !== "enemy") {
+      stop();
+      return;
+    }
+
+    const progress = flight ? Math.min(1, Math.max(0, (time - flight.start) / flightMs)) : 1;
+    const glow = landing ? Math.max(0, 1 - (time - landing.time) / landingMs) : 0;
+    paint(flight, progress, landing?.point, glow);
+    if ((flight || glow > 0) && frame === undefined) {
+      frame = requestFrame(stamp => {
+        frame = undefined;
+        tick(stamp);
+      });
+    }
+  }
+
+  return function sync({view, phase: nextPhase, rallyArrows, runFinished}, generation, reducedMotion) {
+    const reset = lastArrows !== rallyArrows || lastGeneration !== generation;
+    const hit = rallyArrows.at(-1);
+    const newHit = !reset && hit && hit !== lastHit;
+    lastArrows = rallyArrows;
+    lastGeneration = generation;
+    lastHit = hit;
+    phase = nextPhase;
+
+    if (reset || view !== "match" || runFinished || reducedMotion ||
+        (phase !== "enemy" && phase !== "player")) {
+      stop();
+      return;
+    }
+    if (!newHit) return;
+
+    const time = now();
+    if (flight) queued = {hit, time};
+    else begin(hit, time);
+    tick(time);
+  };
+}
+
+let syncRallyFlightDOM;
+function syncRallyFlight() {
+  if (!syncRallyFlightDOM) {
+    const overlay = $("rallyFlight");
+    const match = $("matchView");
+    const panels = [$("servePanel"), $("playerPanel")];
+    const trail = [...overlay.querySelectorAll(".lite-flight-trail")];
+    const ball = overlay.querySelector(".lite-flight-ball");
+    const glow = overlay.querySelector(".lite-flight-glow");
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    for (const panel of panels) {
+      panel.addEventListener("click", event => {
+        if (panel.inert) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      }, true);
+    }
+
+    function place(element, point) {
+      element.style.left = point.x + "%";
+      element.style.top = point.y + "%";
+    }
+
+    const sync = createRallyFlight({
+      courtPoint,
+      now: () => performance.now(),
+      requestFrame: callback => requestAnimationFrame(callback),
+      cancelFrame: id => cancelAnimationFrame(id),
+      lock(active) {
+        match.classList.toggle("lite-rally-active", active);
+        overlay.hidden = !active;
+        for (const panel of panels) panel.inert = active;
+      },
+      paint(flight, progress, landed, opacity) {
+        function sample(fraction) {
+          if (!flight) return landed;
+          const t = Math.max(0, fraction);
+          return {
+            x: flight.from.x + (flight.to.x - flight.from.x) * t,
+            y: flight.from.y + (flight.to.y - flight.from.y) * t
+          };
+        }
+
+        place(ball, sample(progress));
+        trail.forEach((dot, index) => {
+          const fraction = progress - (index + 1) * 0.045;
+          dot.hidden = !flight || fraction <= 0;
+          if (!dot.hidden) place(dot, sample(fraction));
+        });
+        glow.style.opacity = opacity;
+        if (landed) place(glow, landed);
+      }
+    });
+    syncRallyFlightDOM = () => sync(state, enemyActionGeneration, motion.matches);
+  }
+  syncRallyFlightDOM();
+}
+
 function renderHistory(){
   const rows=Object.entries(state.history);
   $("history").innerHTML=rows.length?rows.map(([k,v])=>"<div class=\"history-row\"><b>"+k+"</b><br><span class=badge>"+v+"回</span></div>").join(""):"<span class=sub>まだありません。</span>";
