@@ -105,3 +105,10 @@ body.is-match-view #matchView .table.lite-perspective-table{margin:30px 0 23px}
 .table.lite-perspective-table .enemy{top:-34px!important;bottom:auto!important}
 .table.lite-perspective-table .player{top:auto!important;bottom:-39px!important}
 .table.lite-perspective-table .ball-label{top:14%!important;right:2%!important;left:auto!important;transform:none!important;max-width:32%;white-space:nowrap}
+
+/* C-1 court-side orientation: labels sit outside the playing surface. */
+.table.lite-perspective-table .lite-court-side-label{position:absolute!important;z-index:5;display:flex;align-items:center;justify-content:center;width:22px;height:22px;box-sizing:border-box;border:1px solid #55d6ed;border-radius:6px;background:#102a40;color:#e1faff;font-size:12px;font-weight:700;line-height:1;pointer-events:none;transform:translate(-50%,-50%)}
+.table.lite-perspective-table .lite-enemy-f{left:20%;top:20%}
+.table.lite-perspective-table .lite-enemy-b{left:80%;top:20%}
+.table.lite-perspective-table .lite-player-b{left:3%;top:78%}
+.table.lite-perspective-table .lite-player-f{left:97%;top:78%}
