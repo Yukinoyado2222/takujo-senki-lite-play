@@ -124,9 +124,14 @@ body.is-match-view #matchView:not(.lite-rally-active) .lite-ball-name-row:not([h
 #arrow-gray path { fill: #aeb8c2; opacity: .55; }
 #arrow-black path { fill: #00e5ff; }
 
+@media (prefers-reduced-motion: no-preference) {
+  body.is-match-view #matchView .table.lite-perspective-table {
+    transition: height 140ms ease-out;
+  }
+}
 body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
-  height: clamp(188px, 35vh, 280px);
-  height: clamp(188px, 35svh, 280px);
+  height: clamp(196px, 40vh, 304px);
+  height: clamp(196px, 40svh, 304px);
   flex-shrink: 0;
   margin-top: 30px;
 }
@@ -150,15 +155,15 @@ body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
   width: 9px;
   height: 9px;
   background: #7ef8ff;
-  box-shadow: 0 0 8px #39e7ff;
-  opacity: .58;
+  box-shadow: 0 0 10px #39e7ff;
+  opacity: .72;
 }
-.lite-flight-trail:nth-child(3) { width: 7px; height: 7px; opacity: .38; }
-.lite-flight-trail:nth-child(4) { width: 5px; height: 5px; opacity: .22; }
+.lite-flight-trail:nth-child(3) { width: 7px; height: 7px; opacity: .49; }
+.lite-flight-trail:nth-child(4) { width: 5px; height: 5px; opacity: .30; }
 .lite-flight-glow {
-  width: 16px;
-  height: 16px;
-  border: 1px solid #b9fcff;
-  box-shadow: 0 0 9px 3px #5ae9ff;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #b9fcff;
+  box-shadow: 0 0 12px 4px #5ae9ff;
   opacity: 0;
 }
