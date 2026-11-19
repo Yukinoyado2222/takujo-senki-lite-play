@@ -189,7 +189,7 @@ body.is-match-view .topbar{margin:0 0 2px}
 .lite-title-content{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:clamp(18px,7vw,48px) 10px}.lite-title-logo{display:block;width:min(100%,520px);height:auto;max-height:240px;object-fit:contain}.lite-title-content h1{font-size:clamp(25px,7vw,40px);margin:0;font-weight:900}.lite-title-content .screen-intro{margin:0;max-width:34em}.lite-title-start{width:min(100%,360px);min-height:60px;text-align:center;font-size:24px;font-weight:900;background:var(--red);color:#fff}.lite-title-new-run{width:min(100%,360px);text-align:center;font-weight:800}.lite-title-new-run[hidden]{display:none!important}
 body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #viewNav{display:none}
 </style>
-<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=c2a-rally-flight-fixed">
+<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=c2b-point-miss-20261119">
 </head>
 <body><div id="app">
 <img class="title-logo" src="./assets/cards/title_logo.jpeg" alt="卓上戦記"><div class="topbar"><span id="phase" class="phase"></span></div>
@@ -213,6 +213,7 @@ body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #vi
 
 <div id="ballLabel" class="lite-ball-name-row" hidden aria-live="polite"></div>
 <div class="table lite-perspective-table"><svg class="lite-table-surface" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="33,12 67,12 90,88 10,88" fill="#0b2c42" stroke="#00d9f5" stroke-width=".7"/><path d="M25.3333 37.3333H74.6667" fill="none" stroke="#8ceeff" stroke-width=".9"/><path d="M50 12V88" fill="none" stroke="#73ddeb" stroke-width=".4" opacity=".4"/></svg><svg id="rallyArrows" class="rally-arrows" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="arrow-gray" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8a8a8a"></path></marker><marker id="arrow-black" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#171717"></path></marker></defs><g id="rallyArrowLayer"></g></svg><div class="net"></div><div class="lite-court-side-label lite-enemy-f" aria-label="相手フォア側">F</div><div class="lite-court-side-label lite-enemy-b" aria-label="相手バック側">B</div><div class="lite-court-side-label lite-player-b" aria-label="自分バック側">B</div><div class="lite-court-side-label lite-player-f" aria-label="自分フォア側">F</div><div id="landingMarker" class="lite-landing-marker" aria-hidden="true"></div><div id="ball" class="ball"></div>
+<div id="pointCue" class="lite-point-cue" hidden role="status" aria-live="polite"><span class="lite-point-line"></span><strong id="pointCueText"></strong><span class="lite-point-line"></span></div>
 <div id="rallyFlight" class="lite-rally-flight" hidden aria-hidden="true">
   <span class="lite-flight-glow"></span>
   <span class="lite-flight-ball"></span>
@@ -475,6 +476,7 @@ function serverIsPlayerNow(){
 }
 
 function pointReset(){
+  if(typeof pointCuePending!=="undefined"&&pointCuePending&&typeof clearPointCue==="function")clearPointCue();
   state.aiError=null;state.aiRecoveryAttempts=0;state.aiResumeAtLimitUsed=false;state.enemyHitToken++;
   state.finisherPending=false;state.finisherRecoil=false;state.powerPending=false;state.powerRecoil=false;state.feintPending=false;state.knucklePending=false;
   drawHand(); state.pointBalls=0;state.playerLast=null;state.enemyLast=null;state.pendingHistory=null;state.rallyArrows=[];resetEnemyReturnState();
@@ -504,7 +506,7 @@ function restoreCampaignState(session){
   return true;
 }
 function resetForBossTest(build,gp){
-  if(devBossSession)return false;
+  if((typeof pointCuePending!=="undefined"&&pointCuePending)||devBossSession)return false;
   if(devBossResult){devBossArchive.push(cloneGameData(devBossResult));devBossResult=null}
   const snapshot={state:cloneGameData(state),enemy:cloneGameData(enemy),activeCardCategory};
   enemyActionGeneration++;
@@ -532,6 +534,7 @@ function resetForBossTest(build,gp){
   pointReset();render();return true;
 }
 function finishDevBossMatch(){
+  if(typeof clearPointCue==="function")clearPointCue();
   const session=devBossSession;
   if(!session||session.ended||session.restored)return false;
   session.ended=true;state.matchFinished=true;
@@ -541,6 +544,7 @@ function finishDevBossMatch(){
   devBossResultVisible=true;render();return true;
 }
 function abortDevBossTest(){
+  if(typeof clearPointCue==="function")clearPointCue();
   const session=devBossSession;
   if(!session||session.ended||session.restored)return false;
   session.ended=true;
@@ -574,12 +578,13 @@ function renderDevBoss(){
   if(!p)return;
   p.classList.toggle("hidden",!DEV_MODE);
   const start=$("devBossStart"),abort=$("devBossAbort");
-  if(start){start.hidden=!!devBossSession;start.disabled=!!devBossSession}
+  if(start){start.hidden=!!devBossSession;start.disabled=!!devBossSession||(typeof pointCuePending!=="undefined"&&pointCuePending)}
   if(abort)abort.hidden=!devBossSession;
   if(DEV_MODE&&start)start.onclick=()=>resetForBossTest($("devBuild").value,$("devGp").value);
 }
 
 function newRun(){
+  if(typeof clearPointCue==="function")clearPointCue();
   state.view="match";state.matchNumber=1;state.matchTarget=3;state.bossTest=false;state.runFinished=false;state.matchFinished=false;
   state.gp=0;state.my=0;state.enemy=0;state.lastPointResult=null;state.overworkUpgrades=null;state.restBonusMatch=null;
   state.learned=["push","foreDrive","backBlock"];
@@ -644,6 +649,7 @@ function navigationViews(){
   return ["start","match","history","log"];
 }
 function setView(view){
+  if(typeof pointCuePending!=="undefined"&&pointCuePending)return false;
   const allowed=["start","match","progress","history","log","result"];
   if(!allowed.includes(view))return false;
   if(devBossSession&&!["match","history","log"].includes(view))return false;
@@ -663,7 +669,7 @@ function render(){
   renderPointResult();
   renderEnemyAIError();
   $("phase").textContent=phaseName();
-  $("myScore").textContent=state.my;$("enemyScore").textContent=state.enemy;const en=$("enemyName");if(en)en.textContent=enemy.name;
+  $("myScore").textContent=pointCuePending&&!pointCueVisible?pointCuePreviousMy:state.my;$("enemyScore").textContent=pointCuePending&&!pointCueVisible?pointCuePreviousEnemy:state.enemy;const en=$("enemyName");if(en)en.textContent=enemy.name;
   if(state.bossTest)$("phase").textContent+=" ／ ラスボス11点";
   const mi=$("matchInfo");if(mi)mi.textContent=devBossSession?"開発用ボス戦・11点先取":"第"+state.matchNumber+"試合・"+state.matchTarget+"点先取";
   $("matchView").classList.toggle("hidden",state.view!=="match");
@@ -699,6 +705,7 @@ function render(){
 function renderPointResult(){
   const panel=$("pointResultPanel"),text=$("pointResultText");
   if(!panel||!text)return;
+  if(typeof pointCuePending!=="undefined"&&pointCuePending&&!pointCueVisible)return;
   const result=pointResultText();
   panel.classList.toggle("hidden",!result);
   text.textContent=result;
@@ -1037,7 +1044,13 @@ function createRallyFlight({courtPoint, now, requestFrame, cancelFrame, lock, pa
     }
   }
 
-  return function sync({view, phase: nextPhase, rallyArrows, runFinished}, generation, reducedMotion) {
+  function remainingMs() {
+    if (queued && flight) return Math.max(0, Math.max(flight.start + flightMs, queued.time) + flightMs + landingMs - now());
+    if (flight) return Math.max(0, flight.start + flightMs + landingMs - now());
+    if (landing) return Math.max(0, landing.time + landingMs - now());
+    return 0;
+  }
+  function sync({view, phase: nextPhase, rallyArrows, runFinished}, generation, reducedMotion) {
     const reset = lastArrows !== rallyArrows || lastGeneration !== generation;
     const hit = rallyArrows.at(-1);
     const newHit = !reset && hit && hit !== lastHit;
@@ -1057,10 +1070,12 @@ function createRallyFlight({courtPoint, now, requestFrame, cancelFrame, lock, pa
     if (flight) queued = {hit, time};
     else begin(hit, time);
     tick(time);
-  };
+  }
+  sync.remainingMs = remainingMs;
+  return sync;
 }
 
-let syncRallyFlightDOM;
+let syncRallyFlightDOM, cancelRallyFlightDOM, remainingRallyFlightDOM;
 function syncRallyFlight() {
   if (!syncRallyFlightDOM) {
     const overlay = $("rallyFlight");
@@ -1091,7 +1106,7 @@ function syncRallyFlight() {
       lock(active) {
         match.classList.toggle("lite-rally-active", active);
         overlay.hidden = !active;
-        for (const panel of panels) panel.inert = active;
+        for (const panel of panels) panel.inert = active || pointCuePending;
       },
       paint(flight, progress, landed, opacity) {
         const point = flight ? {
@@ -1104,6 +1119,8 @@ function syncRallyFlight() {
       }
     });
     syncRallyFlightDOM = () => sync(state, enemyActionGeneration, motion.matches);
+    cancelRallyFlightDOM = () => sync({...state, phase:"serve"}, enemyActionGeneration, motion.matches);
+    remainingRallyFlightDOM = () => motion.matches ? 0 : sync.remainingMs();
   }
   syncRallyFlightDOM();
 }
@@ -1130,7 +1147,7 @@ function executeServe(){
 }
 
 function enemyServe(){
-  if(state.phase!=="enemy")return;
+  if((typeof pointCuePending!=="undefined"&&pointCuePending)||state.phase!=="enemy")return;
   const ids=enemy.serves||["underShort","knuckleLong"];
   const id=ids[Math.floor(Math.random()*ids.length)];
   const s=SERVES[id];
@@ -1217,7 +1234,7 @@ function renderEnemyAIError(){
 }
 
 function enemyHit(token){
-  if(state.phase!=="enemy")return;
+  if((typeof pointCuePending!=="undefined"&&pointCuePending)||state.phase!=="enemy")return;
   if(token!==undefined&&token!==state.enemyHitToken)return;
   const b=state.ball;
   const enemyPosition=b.course;
@@ -1471,7 +1488,7 @@ function calculationHTML(shot){
   return "<div class=calculation><b>成功率（判定前）</b><br>選択スキルカード："+t.name+"<br><br>基本成功率：◆"+breakdown.base+"<br><br><b>適正ボール：</b><br>回転："+idealSpinDisplay(t)+"<br>速度："+idealPowerDisplay(t,state.card)+"<br>長さ："+idealLengths.join("・")+"<br><br><b>現在のボール：</b><br>回転："+spinDisplay(spinKey(b))+"<br>速度：★"+b.power+"<br>長さ："+b.length+"<br><br><b>適用補正：</b>"+(modifiers||"<br>なし")+counterInfo+"<br><br>制限前合計：◆"+breakdown.raw+clampInfo+"<br>今回の実際の stroke side："+sideName(shot.strokeSide)+"<br>前回 course / stroke side："+(last?sideName(last.course)+" / "+sideName(last.strokeSide):"なし")+"<div class=final>＝ 最終成功率 ◆"+breakdown.level+"（"+breakdown.rate+"%）</div></div>";
 }
 function resolvePlayerShot(){
-  if(state.runFinished)return;
+  if(state.runFinished||(typeof pointCuePending!=="undefined"&&pointCuePending))return;
   const shot=state.selectedShot;
   if(state.phase!=="player"||!shot||shot.step!=="preview")return;
   const t=TECHS[shot.id],card=state.card;
@@ -1533,12 +1550,49 @@ function playerSpin(id){
   return state.ball.spin;
 }
 
+// C-2b is presentation-only: scoring and RNG have already been resolved.
+let pointCuePending=false, pointCueVisible=false, pointCueTimer=null;
+let pointCuePreviousMy=0, pointCuePreviousEnemy=0, pointCueSerial=0;
+function clearPointCue(){
+  pointCueSerial++;
+  if(pointCueTimer!==null && typeof clearTimeout==="function")clearTimeout(pointCueTimer);
+  pointCueTimer=null;pointCuePending=false;pointCueVisible=false;
+  const cue=$("pointCue");if(cue)cue.hidden=true;
+  const match=$("matchView");if(match){match.classList.toggle("lite-point-pending",false);match.classList.toggle("lite-point-visible",false);}
+  for(const id of ["servePanel","playerPanel"])$(id).inert=false;
+}
 function returnPoint(who){
-  if(devBossResultVisible||state.runFinished)return;
+  if(devBossResultVisible||state.runFinished||pointCuePending)return;
   recordPointResult(who);
-  if(state.my>=state.matchTarget||state.enemy>=state.matchTarget){finishMatch();return}
-  addLog("ポイント終了："+state.my+"-"+state.enemy);
-  pointReset();render();
+  pointCuePending=true;pointCueVisible=false;
+  pointCuePreviousMy=state.my-(who==="win"?1:0);
+  pointCuePreviousEnemy=state.enemy-(who==="lose"?1:0);
+  const serial=++pointCueSerial;
+  const match=$("matchView");
+  match.classList.add("lite-point-pending");
+  for(const id of ["servePanel","playerPanel"])$(id).inert=true;
+  // An enemy miss is resolved 300ms after the player's 500ms outbound flight begins.
+  // Wait for the remaining flight and 250ms landing glow before showing the result.
+  const waitForFlight=remainingRallyFlightDOM ? remainingRallyFlightDOM() : 0;
+  pointCueTimer=setTimeout(()=>{
+    if(serial!==pointCueSerial)return;
+    pointCueVisible=true;
+    if(cancelRallyFlightDOM)cancelRallyFlightDOM();
+    const cue=$("pointCue");
+    $("pointCueText").textContent=who==="win"?"POINT":"MISS";
+    cue.classList.toggle("is-miss",who!=="win");
+    cue.hidden=false;
+    match.classList.add("lite-point-visible");
+    render();
+    pointCueTimer=setTimeout(()=>{
+      if(serial!==pointCueSerial)return;
+      clearPointCue();
+      if(state.my>=state.matchTarget||state.enemy>=state.matchTarget){finishMatch();return}
+      addLog("ポイント終了："+state.my+"-"+state.enemy);
+      pointReset();render();
+    },600);
+  },waitForFlight);
+  render();
 }
 
 function recordPointResult(who){state.lastPointResult={winner:who,my:state.my,enemy:state.enemy};}
@@ -1774,6 +1828,7 @@ function applyOverwork(){
   addLog("オーバーワーク：2ptを消費し、空振りをデッキに追加。");finishEvent();return true;
 }
 function finishMatch(){
+  if(typeof clearPointCue==="function")clearPointCue();
   if(devBossSession)return finishDevBossMatch();
   if(devBossResultVisible)return false;
   if(state.runFinished||state.matchFinished)return false;
