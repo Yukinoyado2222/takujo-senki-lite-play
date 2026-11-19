@@ -189,7 +189,7 @@ body.is-match-view .topbar{margin:0 0 2px}
 .lite-title-content{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:clamp(18px,7vw,48px) 10px}.lite-title-logo{display:block;width:min(100%,520px);height:auto;max-height:240px;object-fit:contain}.lite-title-content h1{font-size:clamp(25px,7vw,40px);margin:0;font-weight:900}.lite-title-content .screen-intro{margin:0;max-width:34em}.lite-title-start{width:min(100%,360px);min-height:60px;text-align:center;font-size:24px;font-weight:900;background:var(--red);color:#fff}.lite-title-new-run{width:min(100%,360px);text-align:center;font-weight:800}.lite-title-new-run[hidden]{display:none!important}
 body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #viewNav{display:none}
 </style>
-<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=d1-return-info-20261120">
+<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=d2-ideal-conditions-20261120">
 </head>
 <body><div id="app">
 <img class="title-logo" src="./assets/cards/title_logo.jpeg" alt="卓上戦記"><div class="topbar"><span id="phase" class="phase"></span></div>
@@ -813,9 +813,14 @@ function shotQualityPreview(id){
 }
 // Presentation-only labels; never used in scoring.
 function liteIdealBallLabel(id){
-  const t=TECHS[id],spins=(techIsUpgraded(id)&&t.idealSpinsPlus)||t.idealSpins||[t.idealSpin];
+  const t=TECHS[id],spins=idealSpinOptions(t);
   const lengths=(techIsUpgraded(id)&&t.idealLengthPlus)||[t.idealLength];
-  return "適正回転 "+spins.map(v=>v==="無"?"○無":v.startsWith("上")?"↻"+v.slice(1):"↺"+v.slice(1)).join("・")+" ／ 速度 "+idealPowerDisplay(t,state.card)+" ／ 長さ "+lengths.join("・");
+  const spinText=spins.map(v=>v==="無"?"○無":v.startsWith("上")?"↻"+v.slice(1):v.startsWith("下")?"↺"+v.slice(1):v).join("・")||"指定なし";
+  const spinClass="lite-ideal-row lite-ideal-spin"+(spins.length>=3?" is-compact":"");
+  const speedText=idealPowerDisplay(t,state.card).replace(/★/g,"⚡");
+  return "<span class='"+spinClass+"'>回転 "+spinText+"</span>"+
+    "<span class='lite-ideal-row lite-ideal-speed'>速度 "+speedText+"</span>"+
+    "<span class='lite-ideal-row lite-ideal-length'>長さ "+lengths.join("・")+"</span>";
 }
 // Preview the exact power used after resolvePlayerShot increments pointBalls.
 // Read-only: no temporary state mutation, RNG, or change to playerPower rules.
