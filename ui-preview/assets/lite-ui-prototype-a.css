@@ -153,3 +153,13 @@ body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
   box-shadow: 0 0 12px 4px #5ae9ff;
   opacity: 0;
 }
+
+/* C-2b POINT/MISS cue. The score changes only when the cue becomes visible. */
+#matchView.lite-point-pending :is(#servePanel,#playerPanel){pointer-events:none!important}
+#matchView.lite-point-visible :is(#servePanel,#playerPanel,#ballLabel){display:none!important}
+#matchView.lite-point-visible :is(#ball,#landingMarker){visibility:hidden!important}
+.lite-point-cue[hidden]{display:none!important}
+.lite-point-cue{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;pointer-events:none;background:rgba(4,17,31,.42)}
+.lite-point-cue strong{font-size:clamp(29px,8vw,46px);font-weight:900;letter-spacing:.12em;color:#70f0b8;text-shadow:0 0 12px rgba(112,240,184,.55)}
+.lite-point-cue.is-miss strong{color:#ff9d8a;text-shadow:0 0 12px rgba(255,157,138,.45)}
+.lite-point-line{height:2px;width:68%;background:#42dcec;box-shadow:0 0 9px rgba(66,220,236,.7)}
