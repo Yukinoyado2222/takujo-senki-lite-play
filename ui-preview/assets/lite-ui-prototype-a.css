@@ -174,3 +174,16 @@ body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
 .lite-match-verdict.is-exiting{animation:lite-verdict-out .2s ease-in both}
 @keyframes lite-verdict-in{from{opacity:0}to{opacity:1}}
 @keyframes lite-verdict-out{from{opacity:1}to{opacity:0}}
+
+/* D-1: compact return information; layout only. */
+#techDetail .lite-tech-heading{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+#techDetail .lite-tech-base{font-size:.88em;white-space:nowrap}
+#techDetail .lite-tech-description{margin-top:4px}
+#techDetail .lite-ideal-summary{margin-top:5px}
+#techDetail .lite-outgoing-summary{margin-top:7px;padding-top:7px;border-top:1px solid #39768d;line-height:1.5;overflow-wrap:anywhere}
+#techDetail .lite-outgoing-spin{color:#70b8ff;font-weight:700}
+#techDetail .lite-outgoing-speed{color:#ffca69;font-weight:700}
+#techDetail .lite-tech-changes{margin-top:5px}
+#shotActions .lite-calc-compact{line-height:1.5}
+#shotActions .lite-calc-line{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:4px 0}
+#shotActions .lite-calc-final{padding-top:8px;margin-top:8px;border-top:1px solid #39768d}
