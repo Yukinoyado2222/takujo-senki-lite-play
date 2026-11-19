@@ -189,7 +189,7 @@ body.is-match-view .topbar{margin:0 0 2px}
 .lite-title-content{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:clamp(18px,7vw,48px) 10px}.lite-title-logo{display:block;width:min(100%,520px);height:auto;max-height:240px;object-fit:contain}.lite-title-content h1{font-size:clamp(25px,7vw,40px);margin:0;font-weight:900}.lite-title-content .screen-intro{margin:0;max-width:34em}.lite-title-start{width:min(100%,360px);min-height:60px;text-align:center;font-size:24px;font-weight:900;background:var(--red);color:#fff}.lite-title-new-run{width:min(100%,360px);text-align:center;font-weight:800}.lite-title-new-run[hidden]{display:none!important}
 body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #viewNav{display:none}
 </style>
-<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=c3-match-verdict-20261119">
+<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=d1-return-info-20261120">
 </head>
 <body><div id="app">
 <img class="title-logo" src="./assets/cards/title_logo.jpeg" alt="卓上戦記"><div class="topbar"><span id="phase" class="phase"></span></div>
@@ -830,10 +830,11 @@ function litePreviewPower(id){
 }
 function liteOutgoingBallLabel(id){
   const spin=playerSpin(id),level=techIsUpgraded(id)&&["foreDrive","foreCut"].includes(id)?2:1;
-  return "返球予定：回転 "+(spin==="無"?"○無":(spin==="上"?"↻":"↺")+level)+" ／ 速度 ⚡"+litePreviewPower(id)+" ／ 長さ "+(TECHS[id].outputLength||"ロング");
+  return "返球予定：<span class=\"lite-outgoing-spin\">"+(spin==="無"?"○無":(spin==="上"?"↻":"↺")+level)+"</span> ／ <span class=\"lite-outgoing-speed\">⚡"+litePreviewPower(id)+"</span> ／ "+(TECHS[id].outputLength||"ロング");
 }
 function shotQualityDetail(id){
-  const t=TECHS[id],spin=playerSpin(id),level=techIsUpgraded(id)&&["foreDrive","foreCut"].includes(id)?2:1;
+  const t=TECHS[id];
+  const base=LITE_BASE_LEVELS[id];
   const changes=[];
   if(techIsUpgraded(id)){
     if(["foreDrive","foreCut"].includes(id))changes.push("↑ 強化：回転量+1");
@@ -842,10 +843,11 @@ function shotQualityDetail(id){
     else changes.push("↑ 強化済み");
   }
   if(state.card&&cardIsValidForTechnique(state.card,id))changes.push("札 カード："+CARDS[state.card].name);
-  return "<strong>"+techName(id)+"</strong>　"+(t.side==="F"?"フォア面":t.side==="B"?"バック面":"両面")+
-    "／基本◆"+LITE_BASE_LEVELS[id]+"（"+LITE_SUCCESS_RATES[LITE_BASE_LEVELS[id]]+"%）　"+t.desc+"<div class=lite-ideal-summary>"+liteIdealBallLabel(id)+"</div>"+
-    "<div class=lite-outgoing-summary>"+liteOutgoingBallLabel(id)+"</div>"+
-    (changes.length?"<div>"+changes.join("・")+"</div>":"");
+  return "<div class='lite-tech-heading'><strong>"+techName(id)+"</strong><span class='lite-tech-base'>基本 ◆"+base+"（"+LITE_SUCCESS_RATES[base]+"%）</span></div>"+
+    "<div class='lite-tech-description'>"+t.desc+"</div>"+
+    "<div class='lite-ideal-summary'>"+liteIdealBallLabel(id)+"</div>"+
+    "<div class='lite-outgoing-summary'>"+liteOutgoingBallLabel(id)+"</div>"+
+    (changes.length?"<div class='lite-tech-changes'>"+changes.join("・")+"</div>":"");
 }
 function renderEquipmentPanel(){
   const panel=$("equipmentPanel");
@@ -1477,15 +1479,14 @@ function playerSuccess(t,b,foot,card,strokeSide,targetCourse){
   return playerSuccessBreakdown(t,b,foot,card,strokeSide,targetCourse).rate;
 }
 function calculationHTML(shot){
-  const t=TECHS[shot.id],b=shot.ball;
-  const breakdown=playerSuccessBreakdown(t,b,shot.footwork,state.card,shot.strokeSide,shot.course);
+  const breakdown=playerSuccessBreakdown(TECHS[shot.id],shot.ball,shot.footwork,state.card,shot.strokeSide,shot.course);
   const signed=value=>(value>0?"+":"")+value;
-  const idealLengths=techIsUpgraded(shot.id)&&t.idealLengthPlus?t.idealLengthPlus:[t.idealLength];
-  const modifiers=breakdown.modifiers.map(item=>"<br>"+item.label+"：◆"+signed(item.value)).join("");
-  const clampInfo=breakdown.raw!==breakdown.level?"<br>◆0〜◆6への制限：◆"+breakdown.raw+" → ◆"+breakdown.level:"";
-  const counterInfo=state.card==="counter"&&cardAllowsTechnique("counter",shot.id)?"<br>カウンター：適正速度+2（返球速度は変化なし）":"";
-  const last=state.playerLast;
-  return "<div class=calculation><b>成功率（判定前）</b><br>選択スキルカード："+t.name+"<br><br>基本成功率：◆"+breakdown.base+"<br><br><b>適正ボール：</b><br>回転："+idealSpinDisplay(t)+"<br>速度："+idealPowerDisplay(t,state.card)+"<br>長さ："+idealLengths.join("・")+"<br><br><b>現在のボール：</b><br>回転："+spinDisplay(spinKey(b))+"<br>速度：★"+b.power+"<br>長さ："+b.length+"<br><br><b>適用補正：</b>"+(modifiers||"<br>なし")+counterInfo+"<br><br>制限前合計：◆"+breakdown.raw+clampInfo+"<br>今回の実際の stroke side："+sideName(shot.strokeSide)+"<br>前回 course / stroke side："+(last?sideName(last.course)+" / "+sideName(last.strokeSide):"なし")+"<div class=final>＝ 最終成功率 ◆"+breakdown.level+"（"+breakdown.rate+"%）</div></div>";
+  const modifiers=breakdown.modifiers.filter(item=>item.value!==0)
+    .map(item=>"<div class='lite-calc-line'><span>"+item.label+"</span><strong>◆"+signed(item.value)+"</strong></div>").join("");
+  return "<div class='calculation lite-calc-compact'>"+
+    "<div class='lite-calc-line'><span>基本成功率</span><strong>◆"+breakdown.base+"（"+LITE_SUCCESS_RATES[breakdown.base]+"%）</strong></div>"+
+    modifiers+
+    "<div class='lite-calc-line lite-calc-final'><strong>最終成功率</strong><strong>◆"+breakdown.level+"（"+breakdown.rate+"%）</strong></div></div>";
 }
 function resolvePlayerShot(){
   if(state.runFinished||(typeof pointCuePending!=="undefined"&&pointCuePending))return;
