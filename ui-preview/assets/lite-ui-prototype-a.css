@@ -63,9 +63,21 @@ h1,h2,.score,.big{color:#f0f8ff}
 
 /* Prototype B: technique ideals and outgoing-ball detail. */
 #tech .card-description{font-size:clamp(10px,2.6vw,12px);line-height:1.35}
-#tech .lite-ideal-on-card{display:block;margin-top:5px;color:#b8dbe9;font-weight:500}
+#tech .lite-ideal-on-card{display:block;margin-top:5px;color:#b8dbe9;font-weight:500;line-height:1.18}
+.lite-ideal-row{display:block;white-space:nowrap;line-height:1.2}
+.lite-ideal-spin{color:#70b8ff;font-size:.84em;letter-spacing:-.025em}
+.lite-ideal-spin.is-compact{font-size:clamp(8px,2.2vw,9px);letter-spacing:-.055em}
+.lite-ideal-speed{color:#ffca69;font-size:.88em}
+.lite-ideal-length{color:#f4f8ff;font-size:.84em}
+#tech .lite-ideal-row{overflow:hidden;text-overflow:clip}
+#tech .lite-ideal-spin{font-size:clamp(8px,2.45vw,10px)}
+#tech .lite-ideal-spin.is-compact{font-size:clamp(8px,2.15vw,9px);letter-spacing:-.055em}
+#tech .lite-ideal-speed,#tech .lite-ideal-length{font-size:clamp(9px,2.65vw,11px)}
 #techDetail{padding:12px 13px;line-height:1.65}
 #techDetail .lite-ideal-summary{color:#9edeee;font-size:.93em;margin-top:4px}
+#techDetail .lite-ideal-spin.is-compact{font-size:.72em}
+#techDetail .lite-ideal-speed{color:#ffca69}
+#techDetail .lite-ideal-length{color:#f4f8ff}
 #techDetail .lite-outgoing-summary{color:#f4f8ff;font-weight:700;margin-top:4px}
 #playerCourseControls{margin-top:10px}
 #shotActions .success-rate-label strong{color:#7ee7a8}
