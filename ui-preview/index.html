@@ -213,7 +213,7 @@ body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #vi
 
 <div id="ballLabel" class="lite-ball-name-row" hidden aria-live="polite"></div>
 <div class="table lite-perspective-table"><svg class="lite-table-surface" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="33,12 67,12 90,88 10,88" fill="#0b2c42" stroke="#00d9f5" stroke-width=".7"/><path d="M25.3333 37.3333H74.6667" fill="none" stroke="#8ceeff" stroke-width=".9"/><path d="M50 12V88" fill="none" stroke="#73ddeb" stroke-width=".4" opacity=".4"/></svg><svg id="rallyArrows" class="rally-arrows" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="arrow-gray" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8a8a8a"></path></marker><marker id="arrow-black" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#171717"></path></marker></defs><g id="rallyArrowLayer"></g></svg><div class="net"></div><div class="lite-court-side-label lite-enemy-f" aria-label="相手フォア側">F</div><div class="lite-court-side-label lite-enemy-b" aria-label="相手バック側">B</div><div class="lite-court-side-label lite-player-b" aria-label="自分バック側">B</div><div class="lite-court-side-label lite-player-f" aria-label="自分フォア側">F</div><div id="landingMarker" class="lite-landing-marker" aria-hidden="true"></div><div id="ball" class="ball"></div>
-<div id="pointCue" class="lite-point-cue" hidden role="status" aria-live="polite"><span class="lite-point-line"></span><strong id="pointCueText"></strong><span class="lite-point-line"></span></div>
+<div id="pointCue" class="lite-point-cue" hidden role="status" aria-live="polite"><span class="lite-point-line"></span><strong id="pointCueText"></strong><span class="lite-point-line"></span></div><div id="matchVerdict" class="lite-match-verdict" hidden role="status" aria-live="polite"><span class="lite-verdict-line"></span><strong id="matchVerdictText"></strong><span class="lite-verdict-line"></span></div>
 <div id="rallyFlight" class="lite-rally-flight" hidden aria-hidden="true">
   <span class="lite-flight-glow"></span>
   <span class="lite-flight-ball"></span>
@@ -1552,8 +1552,17 @@ function playerSpin(id){
 
 // C-2b is presentation-only: scoring and RNG have already been resolved.
 let pointCuePending=false, pointCueVisible=false, pointCueTimer=null;
+let matchVerdictTimer=null, matchVerdictSerial=0;
 let pointCuePreviousMy=0, pointCuePreviousEnemy=0, pointCueSerial=0;
+function clearMatchVerdict(){
+  matchVerdictSerial++;
+  if(matchVerdictTimer!==null && typeof clearTimeout==="function")clearTimeout(matchVerdictTimer);
+  matchVerdictTimer=null;
+  const verdict=$("matchVerdict");if(verdict){verdict.hidden=true;verdict.classList.remove("is-lose","is-exiting");}
+  const match=$("matchView");if(match)match.classList.remove("lite-verdict-visible");
+}
 function clearPointCue(){
+  clearMatchVerdict();
   pointCueSerial++;
   if(pointCueTimer!==null && typeof clearTimeout==="function")clearTimeout(pointCueTimer);
   pointCueTimer=null;pointCuePending=false;pointCueVisible=false;
@@ -1561,8 +1570,29 @@ function clearPointCue(){
   const match=$("matchView");if(match){match.classList.toggle("lite-point-pending",false);match.classList.toggle("lite-point-visible",false);}
   for(const id of ["servePanel","playerPanel"])$(id).inert=false;
 }
+function showMatchVerdict(){
+  const verdict=$("matchVerdict");
+  if(!verdict){clearPointCue();finishMatch();return;}
+  const lost=state.enemy>=state.matchTarget;
+  $("matchVerdictText").textContent=lost?"LOSE":"WIN";
+  verdict.classList.toggle("is-lose",lost);
+  verdict.classList.remove("is-exiting");
+  verdict.hidden=false;
+  $("pointCue").hidden=true;
+  $("matchView").classList.add("lite-verdict-visible");
+  for(const id of ["servePanel","playerPanel"])$(id).inert=true;
+  const serial=++matchVerdictSerial;
+  matchVerdictTimer=setTimeout(()=>{
+    if(serial!==matchVerdictSerial)return;
+    verdict.classList.add("is-exiting");
+    matchVerdictTimer=setTimeout(()=>{
+      if(serial!==matchVerdictSerial)return;
+      clearPointCue();finishMatch();
+    },200);
+  },1000);
+}
 function returnPoint(who){
-  if(devBossResultVisible||state.runFinished||pointCuePending)return;
+  if(devBossResultVisible||state.runFinished||pointCuePending||matchVerdictTimer!==null)return;
   recordPointResult(who);
   pointCuePending=true;pointCueVisible=false;
   pointCuePreviousMy=state.my-(who==="win"?1:0);
@@ -1586,8 +1616,8 @@ function returnPoint(who){
     render();
     pointCueTimer=setTimeout(()=>{
       if(serial!==pointCueSerial)return;
+      if(state.my>=state.matchTarget||state.enemy>=state.matchTarget){showMatchVerdict();return}
       clearPointCue();
-      if(state.my>=state.matchTarget||state.enemy>=state.matchTarget){finishMatch();return}
       addLog("ポイント終了："+state.my+"-"+state.enemy);
       pointReset();render();
     },600);
