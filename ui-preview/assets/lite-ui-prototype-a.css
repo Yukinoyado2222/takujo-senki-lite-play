@@ -163,3 +163,14 @@ body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
 .lite-point-cue strong{font-size:clamp(29px,8vw,46px);font-weight:900;letter-spacing:.12em;color:#70f0b8;text-shadow:0 0 12px rgba(112,240,184,.55)}
 .lite-point-cue.is-miss strong{color:#ff9d8a;text-shadow:0 0 12px rgba(255,157,138,.45)}
 .lite-point-line{height:2px;width:68%;background:#42dcec;box-shadow:0 0 9px rgba(66,220,236,.7)}
+
+/* C-3: match-end verdict; 1s display (0.2s entrance), then 0.2s exit. */
+.lite-match-verdict[hidden]{display:none!important}
+.lite-match-verdict{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;pointer-events:none;background:rgba(2,9,20,.68);animation:lite-verdict-in .2s ease-out both}
+.lite-match-verdict strong{font-size:clamp(38px,11vw,60px);font-weight:900;letter-spacing:.15em;color:#59eaf3;text-shadow:0 0 15px rgba(89,234,243,.55)}
+.lite-match-verdict.is-lose strong{color:#e8a6ba;text-shadow:0 0 15px rgba(232,166,186,.48)}
+.lite-verdict-line{height:2px;width:68%;background:#4ee3f0;box-shadow:0 0 10px rgba(78,227,240,.65)}
+.lite-match-verdict.is-lose .lite-verdict-line{background:#e8a6ba;box-shadow:0 0 10px rgba(232,166,186,.5)}
+.lite-match-verdict.is-exiting{animation:lite-verdict-out .2s ease-in both}
+@keyframes lite-verdict-in{from{opacity:0}to{opacity:1}}
+@keyframes lite-verdict-out{from{opacity:1}to{opacity:0}}
