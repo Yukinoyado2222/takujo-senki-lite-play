@@ -189,7 +189,7 @@ body.is-match-view .topbar{margin:0 0 2px}
 .lite-title-content{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:clamp(18px,7vw,48px) 10px}.lite-title-logo{display:block;width:min(100%,520px);height:auto;max-height:240px;object-fit:contain}.lite-title-content h1{font-size:clamp(25px,7vw,40px);margin:0;font-weight:900}.lite-title-content .screen-intro{margin:0;max-width:34em}.lite-title-start{width:min(100%,360px);min-height:60px;text-align:center;font-size:24px;font-weight:900;background:var(--red);color:#fff}.lite-title-new-run{width:min(100%,360px);text-align:center;font-weight:800}.lite-title-new-run[hidden]{display:none!important}
 body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #viewNav{display:none}
 </style>
-<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=d3-ideal-match-20261120">
+<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=d4-ideal-contrast-20261120">
 </head>
 <body><div id="app">
 <img class="title-logo" src="./assets/cards/title_logo.jpeg" alt="卓上戦記"><div class="topbar"><span id="phase" class="phase"></span></div>
@@ -828,11 +828,13 @@ function liteIdealBallLabel(id,highlightMatch=false){
   const lengths=(techIsUpgraded(id)&&t.idealLengthPlus)||[t.idealLength];
   const spinText=spins.map(v=>v==="無"?"○無":v.startsWith("上")?"↻"+v.slice(1):v.startsWith("下")?"↺"+v.slice(1):v).join("・")||"指定なし";
   const match=highlightMatch?liteIdealMatchFlags(id):{spin:false,speed:false,length:false};
-  const spinClass="lite-ideal-row lite-ideal-spin"+(spins.length>=3?" is-compact":"")+(match.spin?" is-match":"");
+  const judged=highlightMatch&&state.phase==="player"&&!!state.ball;
+  const idealClass=matched=>judged?(matched?" is-match":" is-unmatched"):"";
+  const spinClass="lite-ideal-row lite-ideal-spin"+(spins.length>=3?" is-compact":"")+idealClass(match.spin);
   const speedText=idealPowerDisplay(t,state.card).replace(/★/g,"⚡");
   return "<span class='"+spinClass+"'>回転 "+spinText+"</span>"+
-    "<span class='lite-ideal-row lite-ideal-speed"+(match.speed?" is-match":"")+"'>速度 "+speedText+"</span>"+
-    "<span class='lite-ideal-row lite-ideal-length"+(match.length?" is-match":"")+"'>長さ "+lengths.join("・")+"</span>";
+    "<span class='lite-ideal-row lite-ideal-speed"+idealClass(match.speed)+"'>速度 "+speedText+"</span>"+
+    "<span class='lite-ideal-row lite-ideal-length"+idealClass(match.length)+"'>長さ "+lengths.join("・")+"</span>";
 }
 // Preview the exact power used after resolvePlayerShot increments pointBalls.
 // Read-only: no temporary state mutation, RNG, or change to playerPower rules.
