@@ -78,6 +78,9 @@ h1,h2,.score,.big{color:#f0f8ff}
 #tech .lite-ideal-spin.is-match{color:#a9dfff}
 #tech .lite-ideal-speed.is-match{color:#ffe5a9}
 #tech .lite-ideal-length.is-match{color:#fff}
+/* D-4: highlight exact matches without consuming horizontal text space. */
+#tech .lite-ideal-row.is-match{background:#245367;border-radius:3px}
+#tech .lite-ideal-row.is-unmatched{color:#8c9aaa;font-weight:400}
 #techDetail{padding:12px 13px;line-height:1.65}
 #techDetail .lite-ideal-summary{color:#9edeee;font-size:.93em;margin-top:4px}
 #techDetail .lite-ideal-spin.is-compact{font-size:.72em}
