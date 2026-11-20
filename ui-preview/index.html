@@ -890,6 +890,14 @@ function renderEquipmentPanel(){
     button.setAttribute("aria-expanded",String(open));popup.hidden=!open;
   };
 }
+// D-6: matching stroke-only technique type icons, presentation only.
+function liteTechTypeIcon(type){
+  const common='viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+  const paths=type==="攻撃"
+    ?'<path d="m14.5 17.5 3-3L6.5 3.5l-3 3 11 11Z"/><path d="m13 6 5-5 3 3-5 5"/><path d="m5 16 3 3M3 21l5-5"/><path d="m3 3 18 18"/>'
+    :'<path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/>';
+  return '<svg '+common+'>'+paths+'</svg>';
+}
 function renderPlayer(){
   $("ballInfo").innerHTML=infoHTML();
   if(state.phase!=="player")return;
@@ -905,7 +913,7 @@ function renderPlayer(){
     b.disabled=blocked;
     b.dataset.tech=id;
     b.setAttribute("aria-label",techName(id)+"、"+t.type+(blocked?"、使用不可":shot&&shot.id===id?"、選択中":"")+"");
-    b.innerHTML="<span class=\"card-art\" aria-hidden=\"true\"><span class=\"lite-tech-type-icon\" title=\""+t.type+"\">"+(t.type==="攻撃"?"⚔":"⛨")+"</span>"+(blocked?"<span class=\"card-stamp lite-tech-unavailable\">使用不可</span>":"")+"<span class=\"lite-tech-art-glyph\">"+(id==="backDrive"||id==="foreDrive"?"↗":id==="foreBlock"||id==="backBlock"?"▤":id==="foreSmash"?"‼":id==="foreFlick"||id==="backFlick"?"↗":"↘")+"</span></span><span class=\"card-name\">"+techName(id)+"</span><span class=\"card-description\"><span class=lite-ideal-on-card>"+liteIdealBallLabel(id,true)+"</span></span>";
+    b.innerHTML="<span class=\"card-art\" aria-hidden=\"true\"><span class=\"lite-tech-type-icon\" title=\""+t.type+"\">"+liteTechTypeIcon(t.type)+"</span>"+(blocked?"<span class=\"card-stamp lite-tech-unavailable\">使用不可</span>":"")+"<span class=\"lite-tech-art-glyph\">"+(id==="backDrive"||id==="foreDrive"?"↗":id==="foreBlock"||id==="backBlock"?"▤":id==="foreSmash"?"‼":id==="foreFlick"||id==="backFlick"?"↗":"↘")+"</span></span><span class=\"card-name\">"+techName(id)+"</span><span class=\"card-description\"><span class=lite-ideal-on-card>"+liteIdealBallLabel(id,true)+"</span></span>";
     b.onclick=()=>chooseTech(id);tbox.appendChild(b);
   });
   $("techDetail").innerHTML=shot&&shot.id?shotQualityDetail(shot.id):"技術を選ぶと詳しい返球情報を表示します。↻ 上回転／↺ 下回転／○ 無回転／⚡ 速度";
