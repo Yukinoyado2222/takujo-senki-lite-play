@@ -219,3 +219,11 @@ body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
 #tech .lite-ideal-on-card{margin-top:2px}
 #tech .lite-ideal-row+.lite-ideal-row{margin-top:3px}
 #tech .lite-ideal-row.is-match{border-radius:3px}
+
+/* D-6: group technique name and ideal conditions near the illustration. */
+#tech .card[data-tech]{justify-content:flex-start}
+#tech .card[data-tech] .card-name{flex:0 0 auto;width:100%;box-sizing:border-box;padding:4px 5px 0;font-size:clamp(10px,2.8vw,12px);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:clip;overflow-wrap:normal;letter-spacing:-.025em}
+#tech .card[data-tech] .card-description{flex:0 0 auto;width:100%;box-sizing:border-box;padding:0 5px 5px;min-height:0;overflow:hidden}
+#tech .card[data-tech] .lite-ideal-on-card{margin-top:5px}
+#tech .card[data-tech] .lite-tech-type-icon{display:flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:inherit}
+#tech .card[data-tech] .lite-tech-type-icon svg{display:block;width:20px;height:20px}
