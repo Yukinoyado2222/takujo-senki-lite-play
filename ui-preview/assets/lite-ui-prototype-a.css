@@ -230,11 +230,11 @@ body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
 
 /* D-7: concise technique-only ideal values, larger than D-6 labels. */
 #tech .card[data-tech] .lite-ideal-on-card{margin-top:3px}
-#tech .card[data-tech] .lite-ideal-title{display:block;font-size:10px;font-weight:900;line-height:1.2;color:#ffe5a9;margin-bottom:2px;white-space:nowrap}
+#tech .card[data-tech] .lite-ideal-title{display:block;font-size:12px;font-weight:900;line-height:1.2;color:#ffe5a9;margin-bottom:2px;white-space:nowrap}
 #tech .card[data-tech] .lite-ideal-row{line-height:1.15}
-#tech .card[data-tech] .lite-ideal-spin{font-size:clamp(11px,3.2vw,13px);letter-spacing:-.02em}
-#tech .card[data-tech] .lite-ideal-spin.is-compact{font-size:clamp(9px,2.6vw,11px);letter-spacing:-.045em}
-#tech .card[data-tech] .lite-ideal-speed,#tech .card[data-tech] .lite-ideal-length{font-size:clamp(11px,3.2vw,13px)}
+#tech .card[data-tech] .lite-ideal-spin{font-size:clamp(13px,3.7vw,15px);letter-spacing:-.02em}
+#tech .card[data-tech] .lite-ideal-spin.is-compact{font-size:clamp(11px,3.2vw,13px);letter-spacing:-.045em}
+#tech .card[data-tech] .lite-ideal-speed,#tech .card[data-tech] .lite-ideal-length{font-size:clamp(13px,3.7vw,15px)}
 
 /* D-7 narrow-screen safeguard: long spin values may wrap instead of being clipped. */
 #tech .card[data-tech] .lite-ideal-spin.is-compact{white-space:normal;overflow:visible;overflow-wrap:anywhere;word-break:normal}
