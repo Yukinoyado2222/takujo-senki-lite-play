@@ -836,6 +836,10 @@ function liteIdealBallLabel(id,highlightMatch=false){
     "<span class='lite-ideal-row lite-ideal-speed"+idealClass(match.speed)+"'>速度 "+speedText+"</span>"+
     "<span class='lite-ideal-row lite-ideal-length"+idealClass(match.length)+"'>長さ "+lengths.join("・")+"</span>";
 }
+// D-7: simplify labels on technique cards only; preserve detail text.
+function liteIdealCardLabel(id){
+  return liteIdealBallLabel(id,true).replace(/>回転 /g,">").replace(/>速度 /g,">").replace(/>長さ /g,">");
+}
 // Preview the exact power used after resolvePlayerShot increments pointBalls.
 // Read-only: no temporary state mutation, RNG, or change to playerPower rules.
 function litePreviewPower(id){
@@ -913,7 +917,7 @@ function renderPlayer(){
     b.disabled=blocked;
     b.dataset.tech=id;
     b.setAttribute("aria-label",techName(id)+"、"+t.type+(blocked?"、使用不可":shot&&shot.id===id?"、選択中":"")+"");
-    b.innerHTML="<span class=\"card-art\" aria-hidden=\"true\"><span class=\"lite-tech-type-icon\" title=\""+t.type+"\">"+liteTechTypeIcon(t.type)+"</span>"+(blocked?"<span class=\"card-stamp lite-tech-unavailable\">使用不可</span>":"")+"<span class=\"lite-tech-art-glyph\">"+(id==="backDrive"||id==="foreDrive"?"↗":id==="foreBlock"||id==="backBlock"?"▤":id==="foreSmash"?"‼":id==="foreFlick"||id==="backFlick"?"↗":"↘")+"</span></span><span class=\"card-name\">"+techName(id)+"</span><span class=\"card-description\"><span class=lite-ideal-on-card>"+liteIdealBallLabel(id,true)+"</span></span>";
+    b.innerHTML="<span class=\"card-art\" aria-hidden=\"true\"><span class=\"lite-tech-type-icon\" title=\""+t.type+"\">"+liteTechTypeIcon(t.type)+"</span>"+(blocked?"<span class=\"card-stamp lite-tech-unavailable\">使用不可</span>":"")+"<span class=\"lite-tech-art-glyph\">"+(id==="backDrive"||id==="foreDrive"?"↗":id==="foreBlock"||id==="backBlock"?"▤":id==="foreSmash"?"‼":id==="foreFlick"||id==="backFlick"?"↗":"↘")+"</span></span><span class=\"card-name\">"+techName(id)+"</span><span class=\"card-description\"><span class=lite-ideal-on-card><span class=lite-ideal-title>【適正】</span>"+liteIdealCardLabel(id)+"</span></span>";
     b.onclick=()=>chooseTech(id);tbox.appendChild(b);
   });
   $("techDetail").innerHTML=shot&&shot.id?shotQualityDetail(shot.id):"技術を選ぶと詳しい返球情報を表示します。↻ 上回転／↺ 下回転／○ 無回転／⚡ 速度";
