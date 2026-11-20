@@ -73,6 +73,11 @@ h1,h2,.score,.big{color:#f0f8ff}
 #tech .lite-ideal-spin{font-size:clamp(8px,2.45vw,10px)}
 #tech .lite-ideal-spin.is-compact{font-size:clamp(8px,2.15vw,9px);letter-spacing:-.055em}
 #tech .lite-ideal-speed,#tech .lite-ideal-length{font-size:clamp(9px,2.65vw,11px)}
+/* D-3: exact incoming-ball match emphasis, limited to technique cards. */
+#tech .lite-ideal-row.is-match{font-weight:700}
+#tech .lite-ideal-spin.is-match{color:#a9dfff}
+#tech .lite-ideal-speed.is-match{color:#ffe5a9}
+#tech .lite-ideal-length.is-match{color:#fff}
 #techDetail{padding:12px 13px;line-height:1.65}
 #techDetail .lite-ideal-summary{color:#9edeee;font-size:.93em;margin-top:4px}
 #techDetail .lite-ideal-spin.is-compact{font-size:.72em}
