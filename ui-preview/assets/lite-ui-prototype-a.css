@@ -207,3 +207,15 @@ body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
 #shotActions .lite-calc-compact{line-height:1.5}
 #shotActions .lite-calc-line{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:4px 0}
 #shotActions .lite-calc-final{padding-top:8px;margin-top:8px;border-top:1px solid #39768d}
+
+/* D-5: technique-only compact layout and type/status overlays. */
+#tech .card-art{position:relative;height:36%;flex:0 0 36%}
+#tech .lite-tech-art-glyph{display:block}
+#tech .lite-tech-type-icon{position:absolute;top:5px;left:7px;font-size:19px;line-height:1;color:#ffe5a9;text-shadow:none}
+#tech .card[data-tech] .lite-tech-type-icon{pointer-events:none}
+#tech .card[data-tech] .lite-tech-unavailable{position:absolute;top:5px;right:5px;font-size:9px;padding:2px 3px;line-height:1.2;white-space:nowrap;z-index:1}
+#tech .card-name{padding-top:3px;padding-bottom:1px}
+#tech .card-description{padding-bottom:5px}
+#tech .lite-ideal-on-card{margin-top:2px}
+#tech .lite-ideal-row+.lite-ideal-row{margin-top:3px}
+#tech .lite-ideal-row.is-match{border-radius:3px}
