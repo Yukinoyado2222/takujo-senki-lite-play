@@ -219,7 +219,7 @@ body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #vi
   <span class="lite-flight-ball"></span>
 </div></div>
 
-<div id="servePanel" class="panel"><div class="category-tabs core-tabs" role="group" aria-label="カード分類"><button type="button" class="tab" data-card-category="serve" aria-pressed="true">サーブ</button><button type="button" class="tab" data-card-category="return" aria-pressed="false">スキル</button><button type="button" class="tab" data-card-category="skill" aria-pressed="false">スペシャル</button></div><div class="notice">初期位置はバック側。フォア面でサーブ。サーブカードが回転・長さ・速度を決めます。</div><div id="serve" class="cards-viewport" style="margin-top:8px"><div class="cards"></div></div><section id="serveSpecialCategory" hidden><h2 style="margin-top:10px">スペシャルカード（確認のみ・サーブ時は使用不可）</h2><div id="serveSpecialCards" class="cards-viewport"><div class="cards"></div></div></section><div id="serveCourseControls" class="course-controls"><button type="button" class="course-button" data-serve-course="F" disabled>フォアへサーブ</button><button type="button" class="course-button" data-serve-course="B" disabled>バックへサーブ</button></div></div>
+<div id="servePanel" class="panel"><div class="category-tabs core-tabs" role="group" aria-label="カード分類"><button type="button" class="tab" data-card-category="serve" aria-pressed="true">サーブ</button><button type="button" class="tab" data-card-category="return" aria-pressed="false">スキル</button><button type="button" class="tab" data-card-category="skill" aria-pressed="false">スペシャル</button></div><div class="notice">初期位置はバック側。フォア面でサーブ。サーブカードが回転・長さ・速度を決めます。</div><div id="serve" class="cards-viewport" style="margin-top:8px"><div class="cards"></div></div><div id="serveDetail" class="detail-box lite-serve-detail" aria-live="polite">サーブカードを選ぶと回転・速度・長さを表示します。</div><section id="serveSpecialCategory" hidden><h2 style="margin-top:10px">スペシャルカード（確認のみ・サーブ時は使用不可）</h2><div id="serveSpecialCards" class="cards-viewport"><div class="cards"></div></div></section><div id="serveCourseControls" class="course-controls"><button type="button" class="course-button" data-serve-course="F" disabled>フォアへサーブ</button><button type="button" class="course-button" data-serve-course="B" disabled>バックへサーブ</button></div></div>
 
 <div id="playerPanel" class="panel hidden"><div class="category-tabs core-tabs" role="group" aria-label="カード分類"><button type="button" class="tab" data-card-category="serve" aria-pressed="false">サーブ</button><button type="button" class="tab" data-card-category="return" aria-pressed="true">スキル</button><button type="button" class="tab" data-card-category="skill" aria-pressed="false">スペシャル</button></div><div id="shotCalculation" class="hidden" style="margin-top:10px"></div><section id="returnCategory"><div class="tech-heading"><h2>スキルカード</h2><div id="equipmentPanel" class="equipment-control" aria-label="装備中の用具"></div></div><div id="techViewport" class="cards-viewport"><div id="tech" class="cards"></div></div><div id="techDetail" role="status" aria-live="polite"></div></section><section id="skillCategory"><h2 style="margin-top:10px">スペシャルカード（1球1枚）</h2><div class="cards-viewport"><div id="cards" class="cards"></div></div><div id="specialDetail" class="lite-special-detail" role="status" aria-live="polite"></div></section><div id="playerCourseControls" class="course-controls"><button type="button" class="course-button" data-player-course="F">フォアへ返球</button><button type="button" class="course-button" data-player-course="B">バックへ返球</button></div><div id="shotActions" style="margin-top:9px"></div></div>
 
@@ -831,11 +831,35 @@ function renderServe(){
     if(!s)return;
     const b=document.createElement("button");
     b.type="button";
-    b.className="card"+(state.selectedServe===id?" selected":"");
-    b.innerHTML="<span class=\"card-stamp\">"+(state.selectedServe===id?"選択中":"SELECT")+"</span><span class=\"card-art\" aria-hidden=\"true\">"+(id==="underShort"?"↘":"→")+"</span><span class=\"card-name\">"+techName(id)+"</span><span class=\"card-rate\">"+s.desc+"</span>";
+    b.className="card text-card lite-serve-card"+(state.selectedServe===id?" selected":"");
+    b.dataset.serve=id;
+    const upgraded=techIsUpgraded(id);
+    const spinLevel=serveSpinLevel(id,upgraded);
+    const power=servePower(id,upgraded);
+    const spinLabel=s.spin==="下"?"↺ 下回転":"○ 無回転";
+    const art=s.spin==="下"?"↺":"○";
+    b.setAttribute("aria-label",s.name+"、"+spinLabel+"、速度"+power+"、"+s.length+(state.selectedServe===id?"、選択中":""));
+    b.innerHTML="<span class='card-stamp'>"+(state.selectedServe===id?"選択中":"選択")+"</span>"+
+      "<span class='card-art' aria-hidden='true'><span class='lite-serve-spin-glyph'>"+art+"</span></span>"+
+      "<span class='card-name'>"+techName(id)+"</span>"+
+      "<span class='card-description'><span class='lite-serve-stat'>回転 "+spinLabel+(s.spin==="下"?" ★"+spinLevel:"")+"</span><span class='lite-serve-stat'>速度 ⚡"+power+"</span><span class='lite-serve-stat'>長さ "+s.length+"</span></span>";
     b.onclick=()=>{state.selectedServe=id;state.selectedServeCourse=null;render()};
     strip.appendChild(b);
   });
+  const detail=$("serveDetail");
+  if(detail){
+    const id=state.selectedServe;
+    const s=id&&SERVES[id];
+    if(!s){
+      detail.textContent="サーブカードを選ぶと回転・速度・長さを表示します。";
+    }else{
+      const upgraded=techIsUpgraded(id);
+      const spinLabel=s.spin==="下"?"↺ 下回転 ★"+serveSpinLevel(id,upgraded):"○ 無回転";
+      detail.innerHTML="<div class='lite-serve-detail-title'>"+techName(id)+" <span>選択中</span></div>"+
+        "<div class='lite-serve-detail-stats'><div><b>回転</b>"+spinLabel+"</div><div><b>速度</b>⚡"+servePower(id,upgraded)+"</div><div><b>長さ</b>"+s.length+"</div></div>"+
+        "<p>サーブ先を選ぶと、そのままサーブを実行します。</p>";
+    }
+  }
   document.querySelectorAll("[data-serve-course]").forEach(button=>{
     button.disabled=!state.selectedServe;
     button.classList.toggle("selected",button.dataset.serveCourse===state.selectedServeCourse);
