@@ -241,3 +241,15 @@ body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
 /* D-7 narrow-screen safeguard: long spin values may wrap instead of being clipped. */
 #tech .card[data-tech] .lite-ideal-spin.is-compact{white-space:normal;overflow:visible;overflow-wrap:anywhere;word-break:normal}
 #tech .card[data-tech] .lite-ideal-on-card{overflow:visible}
+
+
+/* D-10: special cards retain the common card silhouette and type SVGs. */
+#cards .card-art,#serveSpecialCards .card-art{position:relative}
+.lite-special-type-icons{position:absolute;top:5px;left:6px;display:flex;gap:2px;color:#ffe5a9}
+.lite-special-type-icons svg{display:block;width:18px;height:18px}
+#cards .card-description,#serveSpecialCards .card-description{font-size:clamp(9px,2.5vw,11px);line-height:1.3;padding:2px 5px 6px;overflow-wrap:anywhere}
+.lite-special-detail{margin-top:8px;padding:10px;border:1px solid #428da6;border-radius:7px;background:#142b3d;color:#f0f7ff;font-size:12px;line-height:1.5}
+.lite-special-detail-title{font-weight:800;font-size:14px;margin-bottom:5px}
+.lite-special-detail-actions{display:flex;gap:8px;margin-top:10px}
+.lite-special-detail-actions button{flex:1;min-width:0}
+.lite-special-reason{margin-top:7px;color:#ffcc9c}
