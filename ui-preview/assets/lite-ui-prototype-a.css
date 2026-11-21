@@ -209,7 +209,9 @@ body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
 #shotActions .lite-calc-final{padding-top:8px;margin-top:8px;border-top:1px solid #39768d}
 
 /* D-5: technique-only compact layout and type/status overlays. */
-#tech .card-art{position:relative;height:36%;flex:0 0 36%}
+#tech .card-art{position:relative;height:44%;flex:0 0 44%}
+/* D-8: retain the proven D-7 information space on narrow screens. */
+@media(max-width:380px){#tech .card-art{height:36%;flex:0 0 36%}}
 #tech .lite-tech-art-glyph{display:block}
 #tech .lite-tech-type-icon{position:absolute;top:5px;left:7px;font-size:19px;line-height:1;color:#ffe5a9;text-shadow:none}
 #tech .card[data-tech] .lite-tech-type-icon{pointer-events:none}
