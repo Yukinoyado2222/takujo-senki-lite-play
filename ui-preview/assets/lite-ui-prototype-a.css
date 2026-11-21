@@ -316,3 +316,15 @@ body.is-match-view #matchView .lite-serve-indicator.is-serving{display:inline-bl
 #growth .lite-preparation-scroll ul{margin:5px 0 10px;padding-left:1.7em}
 #growth .lite-preparation-scroll ul:last-child{margin-bottom:0}
 #growth .lite-preparation-scroll:focus-visible{outline:2px solid #00d9f5;outline-offset:-2px}
+
+/* D-16 C: compact two-column preparation lists, preserving all text. */
+#growth .lite-preparation-summary{padding-top:8px;padding-bottom:8px}
+#growth .lite-preparation-summary p{margin:4px 0 0}
+#growth .lite-preparation-panel{padding:9px 10px}
+#growth .lite-preparation-heading{margin-bottom:5px}
+#growth .lite-preparation-scroll{max-height:200px;font-size:13px;line-height:1.35}
+#growth .lite-preparation-scroll>b{display:block;margin:3px 0 4px}
+#growth .lite-preparation-scroll ul.lite-preparation-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin:0 0 8px;padding:0;list-style:none}
+#growth .lite-preparation-scroll ul.lite-preparation-items:last-child{margin-bottom:0}
+#growth .lite-preparation-items li{min-width:0;overflow-wrap:anywhere;word-break:normal;background:rgba(83,173,206,.09);border:1px solid rgba(83,173,206,.2);border-radius:5px;padding:5px 6px}
+@media(max-width:340px){#growth .lite-preparation-scroll{font-size:12px}#growth .lite-preparation-items li{padding:4px}}
