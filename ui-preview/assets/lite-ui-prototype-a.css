@@ -289,3 +289,13 @@ body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
 #tech .card[data-tech] .lite-ideal-row+.lite-ideal-row{margin-top:2px}
 /* Retain D-8's narrow-screen text space; only shrink art slightly. */
 @media(max-width:380px){#tech .card[data-tech] .card-art,#tech .card[data-tech] img{height:34%;flex-basis:34%}}
+
+/* D-14: single-line score and last scorer feedback. */
+body.is-match-view #matchView .lite-score-line{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:clamp(4px,2vw,12px);font-size:clamp(13px,3.8vw,18px)}
+body.is-match-view #matchView .lite-score-name{min-width:0;overflow-wrap:anywhere;text-align:center}
+body.is-match-view #matchView .lite-score-numbers{display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+body.is-match-view #matchView .lite-score-numbers b{font-size:clamp(23px,6vw,30px);font-weight:900;color:inherit}
+body.is-match-view #matchView .lite-score-numbers b.lite-last-scorer{color:#c28a00}
+@keyframes lite-score-glow{0%{text-shadow:0 0 0 transparent;filter:brightness(1)}40%{text-shadow:0 0 10px #ffdb66;filter:brightness(1.3)}100%{text-shadow:0 0 0 transparent;filter:brightness(1)}}
+body.is-match-view #matchView .lite-score-numbers b.lite-score-flash{animation:lite-score-glow .5s ease-out 1}
+@media(prefers-reduced-motion:reduce){body.is-match-view #matchView .lite-score-numbers b.lite-score-flash{animation:none}}
