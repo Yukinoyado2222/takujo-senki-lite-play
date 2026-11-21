@@ -189,7 +189,7 @@ body.is-match-view .topbar{margin:0 0 2px}
 .lite-title-content{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:clamp(18px,7vw,48px) 10px}.lite-title-logo{display:block;width:min(100%,520px);height:auto;max-height:240px;object-fit:contain}.lite-title-content h1{font-size:clamp(25px,7vw,40px);margin:0;font-weight:900}.lite-title-content .screen-intro{margin:0;max-width:34em}.lite-title-start{width:min(100%,360px);min-height:60px;text-align:center;font-size:24px;font-weight:900;background:var(--red);color:#fff}.lite-title-new-run{width:min(100%,360px);text-align:center;font-weight:800}.lite-title-new-run[hidden]{display:none!important}
 body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #viewNav{display:none}
 </style>
-<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=d14-score-highlight-20261121">
+<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=d15-serve-indicator-20261121">
 </head>
 <body><div id="app">
 <img class="title-logo" src="./assets/cards/title_logo.jpeg" alt="卓上戦記"><div class="topbar"><span id="phase" class="phase"></span></div>
@@ -197,7 +197,7 @@ body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #vi
 <nav id="viewNav" class="view-nav" aria-label="画面切り替え"><button type="button" class="btn" data-view="start" onclick="setView('start')">スタート</button><button type="button" class="btn" data-view="match" onclick="setView('match')">試合</button><button type="button" class="btn" data-view="progress" onclick="setView('progress')">イベント・成長</button><button type="button" class="btn" data-view="history" onclick="setView('history')">ラリー履歴</button><button type="button" class="btn" data-view="log" onclick="setView('log')">ログ</button><button type="button" class="btn" data-view="result" onclick="setView('result')">最終結果</button></nav>
 <div id="startView" class="panel view-screen hidden"><div class="lite-title-content"><img class="lite-title-logo" src="./assets/cards/title_logo.jpeg" alt="卓上戦記"><h1>卓上戦記Lite</h1><p class="screen-intro">卓球ローグライク</p><button type="button" class="btn lite-title-start" onclick="setView('match')">スタート</button><button type="button" id="titleNewRun" class="btn lite-title-new-run" onclick="requestNewRun()">新しいランを開始</button><p class="screen-intro">現在のランを保持したまま戻れます。新しいランを開始すると、現在のランは初期化されます。</p></div></div>
 <div id="matchView" class="view-screen">
-<div class="panel score-panel"><div class="score lite-score-line" aria-label="現在の得点"><span class="lite-score-name">自分</span><span class="lite-score-numbers"><b id="myScore">0</b><span aria-hidden="true">-</span><b id="enemyScore">0</b></span><span id="enemyName" class="lite-score-name">中学生</span></div><div class="sub" id="matchInfo">第1試合・3点先取</div></div>
+<div class="panel score-panel"><div class="score lite-score-line" aria-label="現在の得点"><span class="lite-score-name lite-serve-name"><span id="myServeIndicator" class="lite-serve-indicator" aria-hidden="true"></span>自分</span><span class="lite-score-numbers"><b id="myScore">0</b><span aria-hidden="true">-</span><b id="enemyScore">0</b></span><span class="lite-score-name lite-serve-name"><span id="enemyServeIndicator" class="lite-serve-indicator" aria-hidden="true"></span><span id="enemyName">中学生</span></span></div><span id="serveStatus" class="lite-sr-only" role="status" aria-live="polite"></span><div class="sub" id="matchInfo">第1試合・3点先取</div></div>
 <div id="ballInfo" class="panel ball-summary hidden" aria-label="現在のボールの状態"></div>
 <div id="enemyAIErrorPanel" class="panel ai-error-panel hidden" role="alert" aria-live="assertive">
 <h2>相手AIの処理エラー</h2>
@@ -708,6 +708,16 @@ function renderScoreHighlight(){
   const visibleMy=pointCuePending&&!pointCueVisible?pointCuePreviousMy:state.my;
   const visibleEnemy=pointCuePending&&!pointCueVisible?pointCuePreviousEnemy:state.enemy;
   my.textContent=visibleMy;enemyScore.textContent=visibleEnemy;
+  // D-15: determine the server from the *displayed* score, not the advanced internal score.
+  const visibleTotal=visibleMy+visibleEnemy;
+  const atDeuce=visibleMy>=state.matchTarget-1&&visibleEnemy>=state.matchTarget-1;
+  const playerServing=atDeuce?(visibleTotal-2*(state.matchTarget-1))%2===0:visibleTotal%4<2;
+  const showServe=state.view==="match"&&!state.matchFinished&&!state.runFinished&&!devBossResultVisible&&!(visibleMy>=state.matchTarget||visibleEnemy>=state.matchTarget);
+  $("myServeIndicator").classList.toggle("is-serving",showServe&&playerServing);
+  $("enemyServeIndicator").classList.toggle("is-serving",showServe&&!playerServing);
+  const serveStatus=$("serveStatus");
+  const nextServeText=showServe?(playerServing?"自分がサーブ":"相手がサーブ"):"";
+  if(serveStatus.textContent!==nextServeText)serveStatus.textContent=nextServeText;
   const last=state.lastPointResult;
   const winner=last&&last.my===visibleMy&&last.enemy===visibleEnemy?(last.winner==="win"?"my":last.winner==="lose"?"enemy":null):null;
   const key=state.matchNumber+":"+visibleMy+":"+visibleEnemy;
