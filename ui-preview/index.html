@@ -221,7 +221,7 @@ body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #vi
 
 <div id="servePanel" class="panel"><div class="category-tabs core-tabs" role="group" aria-label="カード分類"><button type="button" class="tab" data-card-category="serve" aria-pressed="true">サーブ</button><button type="button" class="tab" data-card-category="return" aria-pressed="false">スキル</button><button type="button" class="tab" data-card-category="skill" aria-pressed="false">スペシャル</button></div><div class="notice">初期位置はバック側。フォア面でサーブ。サーブカードが回転・長さ・速度を決めます。</div><div id="serve" class="cards-viewport" style="margin-top:8px"><div class="cards"></div></div><section id="serveSpecialCategory" hidden><h2 style="margin-top:10px">スペシャルカード（確認のみ・サーブ時は使用不可）</h2><div id="serveSpecialCards" class="cards-viewport"><div class="cards"></div></div></section><div id="serveCourseControls" class="course-controls"><button type="button" class="course-button" data-serve-course="F" disabled>フォアへサーブ</button><button type="button" class="course-button" data-serve-course="B" disabled>バックへサーブ</button></div></div>
 
-<div id="playerPanel" class="panel hidden"><div class="category-tabs core-tabs" role="group" aria-label="カード分類"><button type="button" class="tab" data-card-category="serve" aria-pressed="false">サーブ</button><button type="button" class="tab" data-card-category="return" aria-pressed="true">スキル</button><button type="button" class="tab" data-card-category="skill" aria-pressed="false">スペシャル</button></div><div id="shotCalculation" class="hidden" style="margin-top:10px"></div><section id="returnCategory"><div class="tech-heading"><h2>スキルカード</h2><div id="equipmentPanel" class="equipment-control" aria-label="装備中の用具"></div></div><div id="techViewport" class="cards-viewport"><div id="tech" class="cards"></div></div><div id="techDetail" role="status" aria-live="polite"></div></section><section id="skillCategory"><h2 style="margin-top:10px">スペシャルカード（1球1枚）</h2><div class="cards-viewport"><div id="cards" class="cards"></div></div></section><div id="playerCourseControls" class="course-controls"><button type="button" class="course-button" data-player-course="F">フォアへ返球</button><button type="button" class="course-button" data-player-course="B">バックへ返球</button></div><div id="shotActions" style="margin-top:9px"></div></div>
+<div id="playerPanel" class="panel hidden"><div class="category-tabs core-tabs" role="group" aria-label="カード分類"><button type="button" class="tab" data-card-category="serve" aria-pressed="false">サーブ</button><button type="button" class="tab" data-card-category="return" aria-pressed="true">スキル</button><button type="button" class="tab" data-card-category="skill" aria-pressed="false">スペシャル</button></div><div id="shotCalculation" class="hidden" style="margin-top:10px"></div><section id="returnCategory"><div class="tech-heading"><h2>スキルカード</h2><div id="equipmentPanel" class="equipment-control" aria-label="装備中の用具"></div></div><div id="techViewport" class="cards-viewport"><div id="tech" class="cards"></div></div><div id="techDetail" role="status" aria-live="polite"></div></section><section id="skillCategory"><h2 style="margin-top:10px">スペシャルカード（1球1枚）</h2><div class="cards-viewport"><div id="cards" class="cards"></div></div><div id="specialDetail" class="lite-special-detail" role="status" aria-live="polite"></div></section><div id="playerCourseControls" class="course-controls"><button type="button" class="course-button" data-player-course="F">フォアへ返球</button><button type="button" class="course-button" data-player-course="B">バックへ返球</button></div><div id="shotActions" style="margin-top:9px"></div></div>
 
 <div id="devBossPanel" class="panel hidden">
 <h2>開発用：ラスボステスト</h2>
@@ -584,6 +584,7 @@ function renderDevBoss(){
 }
 
 function newRun(){
+  selectedSpecialIndex=null;
   if(typeof clearPointCue==="function")clearPointCue();
   state.view="match";state.matchNumber=1;state.matchTarget=3;state.bossTest=false;state.runFinished=false;state.matchFinished=false;
   state.gp=0;state.my=0;state.enemy=0;state.lastPointResult=null;state.overworkUpgrades=null;state.restBonusMatch=null;
@@ -754,13 +755,65 @@ function ensureServeState(){
   state.serves=state.serves.filter(id=>SERVES[id]);
   if(!state.serves.length)state.serves=["underShort","knuckleLong"];
 }
+// D-10: UI-only selection; never mutates the card used by the rally engine.
+let selectedSpecialIndex=null;
+const specialShortText={
+ focus:"成功レベル◆+1",power:"返球速度+1 ／ 反動あり",
+ third:"3球目：◆+1・速度+1",desperation:"劣勢時：◆+1",
+ whiff:"効果なし",counter:"適正速度+2",
+ finisher:"6球目以降：速度+2 ／ 反動あり",
+ feint:"相手の次球：◆−1",knuckleMastery:"無回転時：相手の次球◆−2"
+};
+function specialTypeIcons(type){
+ return (type==="攻撃"||type==="両方"?liteTechTypeIcon("攻撃"):"")+
+ (type==="守備"||type==="両方"?liteTechTypeIcon("守備"):"");
+}
+function specialCardMarkup(id,stamp){
+ const c=CARDS[id];
+ const glyph=id==="focus"?"＋":id==="power"?"‼":id==="third"?"03":id==="counter"?"↻":id==="finisher"?"決":id==="feint"?"幻":"逆";
+ return '<span class="card-stamp">'+stamp+'</span><span class="card-art" aria-hidden="true"><span class="lite-special-type-icons">'+specialTypeIcons(c.suitableType)+'</span>'+glyph+'</span><span class="card-name">'+c.name+'</span><span class="card-description">'+specialShortText[id]+'</span>';
+}
+function specialUseReason(id){
+ if(state.runFinished||state.phase!=="player"||state.card)return "現在は使用できません。";
+ if(id==="third"&&state.pointBalls!==2)return "3球目のみ使用できます。";
+ if(id==="finisher"&&state.pointBalls<5)return "ラリー6球目以降のみ使用できます。";
+ if(id==="desperation"&&state.enemy<=state.my)return "相手がリードしている場合のみ使用できます。";
+ if(state.selectedShot&&!cardIsValidForTechnique(id,state.selectedShot.id))return "選択中の技術には使用できません。";
+ return "";
+}
+function selectSpecial(i){
+ if(state.phase!=="player"||state.card||!Number.isInteger(i)||!CARDS[state.hand[i]])return;
+ selectedSpecialIndex=selectedSpecialIndex===i?null:i;
+ renderPlayer();
+}
+function confirmSpecial(){
+ const i=selectedSpecialIndex;
+ if(!Number.isInteger(i)||!CARDS[state.hand[i]])return;
+ if(specialUseReason(state.hand[i]))return;
+ selectedSpecialIndex=null;
+ useCard(i);
+}
+function renderSpecialDetail(){
+ const panel=$("specialDetail");
+ if(state.phase!=="player"||state.card)selectedSpecialIndex=null;
+ const i=selectedSpecialIndex,id=Number.isInteger(i)?state.hand[i]:null;
+ if(!id||!CARDS[id]){
+  selectedSpecialIndex=null;
+  panel.textContent=state.card?"この球ではスペシャルを使用済みです。":"スペシャルカードを選ぶと詳しい効果を表示します。";
+  return;
+ }
+ const c=CARDS[id],reason=specialUseReason(id);
+ panel.innerHTML='<div class="lite-special-detail-title">'+c.name+'</div><div>'+c.desc+'</div><div class="lite-special-detail-actions"><button type="button" class="btn" data-special-cancel>選択解除</button><button type="button" class="btn" data-special-confirm'+(reason?' disabled':'')+'>使用する</button></div>'+(reason?'<div class="lite-special-reason">'+reason+'</div>':'');
+ panel.querySelector("[data-special-cancel]").onclick=()=>{selectedSpecialIndex=null;renderPlayer()};
+ panel.querySelector("[data-special-confirm]").onclick=confirmSpecial;
+}
 function renderServeSpecialHand(){
   const strip=$("serveSpecialCards").querySelector(".cards");
   strip.innerHTML="";
   state.hand.forEach(id=>{
     const c=CARDS[id],b=document.createElement("button");
     b.type="button";b.className="card text-card";b.disabled=true;
-    b.innerHTML="<span class=\"card-stamp\">確認のみ</span><span class=\"card-art\" aria-hidden=\"true\">"+(id==="focus"?"＋":id==="power"?"‼":id==="third"?"03":id==="counter"?"↻":id==="finisher"?"決":id==="feint"?"幻":"逆")+"</span><span class=\"card-name\">"+c.name+"</span><span class=\"card-description\">適正："+c.suitableType+" ／ "+c.desc+"</span>";
+    b.innerHTML=specialCardMarkup(id,"確認のみ");
     strip.appendChild(b);
   });
   if(!state.hand.length)strip.textContent="手札にスペシャルカードはありません。";
@@ -923,11 +976,12 @@ function renderPlayer(){
   $("techDetail").innerHTML=shot&&shot.id?shotQualityDetail(shot.id):"技術を選ぶと詳しい返球情報を表示します。↻ 上回転／↺ 下回転／○ 無回転／⚡ 速度";
   const cbox=$("cards");cbox.innerHTML="";
   state.hand.forEach((id,i)=>{
-    const c=CARDS[id],b=document.createElement("button");b.className="card text-card"+(state.card===id?" selected":"");
+    const c=CARDS[id],b=document.createElement("button");b.className="card text-card"+(selectedSpecialIndex===i?" selected":"");
     b.disabled=!!state.card;
-    b.innerHTML="<span class=\"card-stamp\">"+(state.card===id?"使用済み":"選択")+"</span><span class=\"card-art\" aria-hidden=\"true\">"+(id==="focus"?"＋":id==="power"?"‼":id==="third"?"03":id==="counter"?"↻":id==="finisher"?"決":id==="feint"?"幻":"逆")+"</span><span class=\"card-name\">"+c.name+"</span><span class=\"card-description\">適正："+c.suitableType+" ／ "+c.desc+(state.card===id?"<br>使用済み":"")+"</span>";
-    b.onclick=()=>useCard(i);cbox.appendChild(b);
+    b.innerHTML=specialCardMarkup(id,state.card===id?"使用済み":selectedSpecialIndex===i?"選択中":"選択");
+    b.onclick=()=>selectSpecial(i);cbox.appendChild(b);
   });
+  renderSpecialDetail();
   const discard=document.createElement("button");discard.type="button";discard.className="card text-card";
   discard.setAttribute("aria-label","捨て札の一覧を表示");
   discard.innerHTML="<span class='card-stamp'>確認</span><span class='card-art' aria-hidden='true'>▤</span><span class='card-name'>捨て札</span><span class='card-description'>"+state.discardPile.length+"枚</span>";
@@ -1194,6 +1248,7 @@ function enemyServe(){
   state.pointBalls=1;
   state.pendingHistory={actor:"enemy",name:s.name};
   addLog("相手："+s.name+"を自分の"+sideName(targetCourse)+"へ（1球目）。");
+  selectedSpecialIndex=null;
   state.phase="player";
   state.card=null;
   render();
@@ -1331,6 +1386,7 @@ function enemyHit(token){
     spin:enemySpin(o.id,b),spinLevel:enemySpinLevel(o.id,b),power:enemyPower(o.id,b),
     course:targetCourse,length:outputLength,
   };
+  selectedSpecialIndex=null;
   state.phase="player";state.card=null;render();
 }
 function enemyTechIsUpgraded(id){return !!id&&enemy.upgradedTechs.includes(id)}
@@ -1543,6 +1599,7 @@ function resolvePlayerShot(){
   if(shot.id==="stop")state.ball.spinLevel=1;
   state.pendingHistory={actor:"player",name:t.name};
   addLog(t.name+"で相手の"+sideName(shot.course)+"へ返球（"+state.pointBalls+"球目）。");
+  selectedSpecialIndex=null;
   state.card=null;state.selectedShot=null;state.phase="enemy";render();
   const token=++state.enemyHitToken,scheduledSession=devBossSession,scheduledGeneration=enemyActionGeneration;
   setTimeout(()=>{if(scheduledGeneration===enemyActionGeneration&&scheduledSession===devBossSession&&token===state.enemyHitToken)enemyHit(token)},300);
