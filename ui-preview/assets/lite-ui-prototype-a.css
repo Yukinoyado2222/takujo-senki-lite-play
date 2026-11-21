@@ -277,3 +277,15 @@ body.is-match-view #matchView.lite-rally-active .table.lite-perspective-table {
 #ballInfo .lite-ball-spin,#ballInfo .lite-ball-speed{font-weight:800}
 #ballInfo .lite-ball-rally{grid-column:2/span 2;text-align:right;font-size:clamp(11px,3vw,13px)}
 @media(max-width:340px){#ballInfo .lite-compact-ball-info{gap:2px 4px;font-size:12px}#ballInfo .lite-ball-rally{font-size:11px}}
+
+
+/* D-13: compact technique cards only; keep serve/special silhouettes unchanged. */
+#tech .card[data-tech]{aspect-ratio:1/1.25}
+#tech.cards{gap:7px}
+#tech .card[data-tech] .card-art,#tech .card[data-tech] img{height:35%;flex:0 0 35%}
+#tech .card[data-tech] .card-name{padding-top:3px}
+#tech .card[data-tech] .card-description{padding-bottom:3px}
+#tech .card[data-tech] .lite-ideal-on-card{margin-top:2px}
+#tech .card[data-tech] .lite-ideal-row+.lite-ideal-row{margin-top:2px}
+/* Retain D-8's narrow-screen text space; only shrink art slightly. */
+@media(max-width:380px){#tech .card[data-tech] .card-art,#tech .card[data-tech] img{height:34%;flex-basis:34%}}
