@@ -189,7 +189,7 @@ body.is-match-view .topbar{margin:0 0 2px}
 .lite-title-content{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:clamp(18px,7vw,48px) 10px}.lite-title-logo{display:block;width:min(100%,520px);height:auto;max-height:240px;object-fit:contain}.lite-title-content h1{font-size:clamp(25px,7vw,40px);margin:0;font-weight:900}.lite-title-content .screen-intro{margin:0;max-width:34em}.lite-title-start{width:min(100%,360px);min-height:60px;text-align:center;font-size:24px;font-weight:900;background:var(--red);color:#fff}.lite-title-new-run{width:min(100%,360px);text-align:center;font-weight:800}.lite-title-new-run[hidden]{display:none!important}
 body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #viewNav{display:none}
 </style>
-<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=d15-serve-indicator-20261121">
+<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=d16-preparation-scroll-20261121">
 </head>
 <body><div id="app">
 <img class="title-logo" src="./assets/cards/title_logo.jpeg" alt="卓上戦記"><div class="topbar"><span id="phase" class="phase"></span></div>
@@ -631,13 +631,11 @@ function startPreparedMatch(){
 }
 function renderMatchPreparation(){
   const list=(ids,upgraded,defs,withType)=>ids.map(id=>"<li>"+defs[id].name+(withType?"（"+defs[id].type+"）":"")+(upgraded.includes(id)?" ＋強化":"")+"</li>").join("");
-  const section=(title,body)=>"<section class='notice' style='grid-column:1/-1'><b>"+title+"</b><ul>"+body+"</ul></section>";
-  return "<div class='notice' style='grid-column:1/-1'><b>第"+state.matchNumber+"試合｜対戦準備</b><p>対戦相手："+enemy.name+" ／ "+state.matchTarget+"点先取</p></div>"+
-    section("相手の使用技術",list(enemy.techs,enemy.upgradedTechs,TECHS,true))+
-    section("相手のサーブ",list(enemy.serves,enemy.upgradedServes,SERVES,false))+
-    section("自分の所持技術",list(state.learned,state.upgradedTechs,TECHS,true))+
-    section("自分のサーブ",list(state.serves,state.upgradedServes,SERVES,false))+
-    "<div class='notice' style='grid-column:1/-1'>所持GP："+state.gp+"pt</div>";
+  const group=(title,techTitle,techs,serveTitle,serves)=>"<section class='notice lite-preparation-panel'><h3 class='lite-preparation-heading'>"+title+"</h3><div class='lite-preparation-scroll scroll-body' tabindex='0' role='region' aria-label='"+title+"の技術とサーブ'><b>"+techTitle+"</b><ul>"+techs+"</ul><b>"+serveTitle+"</b><ul>"+serves+"</ul></div></section>";
+  return "<div class='notice lite-preparation-summary'><b>第"+state.matchNumber+"試合｜対戦準備</b><p>対戦相手："+enemy.name+" ／ "+state.matchTarget+"点先取</p></div>"+
+    group("対戦相手｜"+enemy.name,"相手の使用技術",list(enemy.techs,enemy.upgradedTechs,TECHS,true),"相手のサーブ",list(enemy.serves,enemy.upgradedServes,SERVES,false))+
+    group("自分の情報","自分の所持技術",list(state.learned,state.upgradedTechs,TECHS,true),"自分のサーブ",list(state.serves,state.upgradedServes,SERVES,false))+
+    "<div class='notice lite-preparation-gp'>所持GP："+state.gp+"pt</div>";
 }
 
 function phaseName(){
