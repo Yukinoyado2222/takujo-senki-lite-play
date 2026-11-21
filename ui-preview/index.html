@@ -868,13 +868,14 @@ function renderServe(){
 
 function infoHTML(){
   const b=state.ball;
-  return "<div class=ball-summary-items>"+
-    "<div class=ball-summary-item><b>回転</b> "+spinName(b.spin)+" ★"+b.spinLevel+"</div>"+
-    "<div class=ball-summary-item><b>速度</b> "+"★".repeat(b.power)+"</div>"+
-    "<div class=ball-summary-item><b>コース</b> 受け手の"+sideName(b.course)+"</div>"+
-    "<div class=ball-summary-item><b>長さ</b> "+b.length+"</div>"+
-
-    "<div class=ball-summary-item><b>ラリー</b> 次は"+(state.pointBalls+1)+"球目</div>"+
+  // Match skill-card symbols: ↻/↺ with level, ○無 for no spin, ⚡ for speed.
+  const spin=b.spin==="上"?"↻"+b.spinLevel:b.spin==="下"?"↺"+b.spinLevel:"○無";
+  return "<div class='ball-summary-items lite-compact-ball-info'>"+
+    "<span class='ball-summary-item lite-ball-spin' aria-label='回転'>"+spin+"</span>"+
+    "<span class='ball-summary-item lite-ball-speed' aria-label='速度'>⚡"+b.power+"</span>"+
+    "<span class='ball-summary-item lite-ball-length'>"+b.length+"</span>"+
+    "<span class='ball-summary-item lite-ball-course'>"+sideName(b.course)+"</span>"+
+    "<span class='ball-summary-item lite-ball-rally'>次は"+(state.pointBalls+1)+"球目</span>"+
     "</div>";
 }
 // Display-only preview uses the same outgoing spin and speed rules as shot resolution.
