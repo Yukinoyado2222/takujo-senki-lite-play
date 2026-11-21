@@ -189,7 +189,7 @@ body.is-match-view .topbar{margin:0 0 2px}
 .lite-title-content{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:clamp(18px,7vw,48px) 10px}.lite-title-logo{display:block;width:min(100%,520px);height:auto;max-height:240px;object-fit:contain}.lite-title-content h1{font-size:clamp(25px,7vw,40px);margin:0;font-weight:900}.lite-title-content .screen-intro{margin:0;max-width:34em}.lite-title-start{width:min(100%,360px);min-height:60px;text-align:center;font-size:24px;font-weight:900;background:var(--red);color:#fff}.lite-title-new-run{width:min(100%,360px);text-align:center;font-weight:800}.lite-title-new-run[hidden]{display:none!important}
 body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #viewNav{display:none}
 </style>
-<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=d12-compact-ball-info-20261121">
+<link rel="stylesheet" href="./assets/lite-ui-prototype-a.css?v=d14-score-highlight-20261121">
 </head>
 <body><div id="app">
 <img class="title-logo" src="./assets/cards/title_logo.jpeg" alt="卓上戦記"><div class="topbar"><span id="phase" class="phase"></span></div>
@@ -197,9 +197,8 @@ body.is-start-view .title-logo,body.is-start-view .topbar,body.is-start-view #vi
 <nav id="viewNav" class="view-nav" aria-label="画面切り替え"><button type="button" class="btn" data-view="start" onclick="setView('start')">スタート</button><button type="button" class="btn" data-view="match" onclick="setView('match')">試合</button><button type="button" class="btn" data-view="progress" onclick="setView('progress')">イベント・成長</button><button type="button" class="btn" data-view="history" onclick="setView('history')">ラリー履歴</button><button type="button" class="btn" data-view="log" onclick="setView('log')">ログ</button><button type="button" class="btn" data-view="result" onclick="setView('result')">最終結果</button></nav>
 <div id="startView" class="panel view-screen hidden"><div class="lite-title-content"><img class="lite-title-logo" src="./assets/cards/title_logo.jpeg" alt="卓上戦記"><h1>卓上戦記Lite</h1><p class="screen-intro">卓球ローグライク</p><button type="button" class="btn lite-title-start" onclick="setView('match')">スタート</button><button type="button" id="titleNewRun" class="btn lite-title-new-run" onclick="requestNewRun()">新しいランを開始</button><p class="screen-intro">現在のランを保持したまま戻れます。新しいランを開始すると、現在のランは初期化されます。</p></div></div>
 <div id="matchView" class="view-screen">
-<div class="panel score-panel"><div class="score"><span>自分 <b id="myScore">0</b></span><span><b id="enemyName">中学生</b> <b id="enemyScore">0</b></span></div><div class="sub" id="matchInfo">第1試合・3点先取</div></div>
+<div class="panel score-panel"><div class="score lite-score-line" aria-label="現在の得点"><span class="lite-score-name">自分</span><span class="lite-score-numbers"><b id="myScore">0</b><span aria-hidden="true">-</span><b id="enemyScore">0</b></span><span id="enemyName" class="lite-score-name">中学生</span></div><div class="sub" id="matchInfo">第1試合・3点先取</div></div>
 <div id="ballInfo" class="panel ball-summary hidden" aria-label="現在のボールの状態"></div>
-<div id="pointResultPanel" class="panel point-result hidden"><h2>直近ポイント</h2><div id="pointResultText" class="sub"></div></div>
 <div id="enemyAIErrorPanel" class="panel ai-error-panel hidden" role="alert" aria-live="assertive">
 <h2>相手AIの処理エラー</h2>
 <p id="enemyAIErrorDetail" class="sub">得点とラリー状態を保持しています。</p>
@@ -667,10 +666,9 @@ function render(){
   renderDevBoss();
   document.body.classList.toggle("is-match-view",state.view==="match");
   document.body.classList.toggle("is-start-view",state.view==="start");
-  renderPointResult();
   renderEnemyAIError();
   $("phase").textContent=phaseName();
-  $("myScore").textContent=pointCuePending&&!pointCueVisible?pointCuePreviousMy:state.my;$("enemyScore").textContent=pointCuePending&&!pointCueVisible?pointCuePreviousEnemy:state.enemy;const en=$("enemyName");if(en)en.textContent=enemy.name;
+  renderScoreHighlight();const en=$("enemyName");if(en)en.textContent=enemy.name;
   if(state.bossTest)$("phase").textContent+=" ／ ラスボス11点";
   const mi=$("matchInfo");if(mi)mi.textContent=devBossSession?"開発用ボス戦・11点先取":"第"+state.matchNumber+"試合・"+state.matchTarget+"点先取";
   $("matchView").classList.toggle("hidden",state.view!=="match");
@@ -703,13 +701,26 @@ function render(){
   renderDevBossResult();
 }
 
-function renderPointResult(){
-  const panel=$("pointResultPanel"),text=$("pointResultText");
-  if(!panel||!text)return;
-  if(typeof pointCuePending!=="undefined"&&pointCuePending&&!pointCueVisible)return;
-  const result=pointResultText();
-  panel.classList.toggle("hidden",!result);
-  text.textContent=result;
+// D-14: reflect the last scored point only after the visible score catches up.
+let liteScoreDisplayKey=null;
+function renderScoreHighlight(){
+  const my=$("myScore"),enemyScore=$("enemyScore");
+  const visibleMy=pointCuePending&&!pointCueVisible?pointCuePreviousMy:state.my;
+  const visibleEnemy=pointCuePending&&!pointCueVisible?pointCuePreviousEnemy:state.enemy;
+  my.textContent=visibleMy;enemyScore.textContent=visibleEnemy;
+  const last=state.lastPointResult;
+  const winner=last&&last.my===visibleMy&&last.enemy===visibleEnemy?(last.winner==="win"?"my":last.winner==="lose"?"enemy":null):null;
+  const key=state.matchNumber+":"+visibleMy+":"+visibleEnemy;
+  const changed=liteScoreDisplayKey!==null&&liteScoreDisplayKey!==key;
+  liteScoreDisplayKey=key;
+  for(const [el,side] of [[my,"my"],[enemyScore,"enemy"]]){
+    el.classList.toggle("lite-last-scorer",winner===side);
+    el.classList.remove("lite-score-flash");
+    if(changed&&winner===side){
+      void el.offsetWidth;
+      el.classList.add("lite-score-flash");
+    }
+  }
 }
 function syncCardCategories(){
   document.querySelectorAll("[data-card-category]").forEach(b=>{
