@@ -307,3 +307,12 @@ body.is-match-view #matchView .lite-serve-name #enemyName{min-width:0;overflow:h
 body.is-match-view #matchView .lite-serve-indicator{display:none;flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:#57d9f5;box-shadow:0 0 5px #57d9f588}
 body.is-match-view #matchView .lite-serve-indicator.is-serving{display:inline-block}
 .lite-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+
+/* D-16: independently scrollable opponent/player preparation details. */
+#growth .lite-preparation-summary,#growth .lite-preparation-panel,#growth .lite-preparation-gp{grid-column:1/-1;min-width:0}
+#growth .lite-preparation-panel{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+#growth .lite-preparation-heading{font-size:inherit;margin:0 0 8px;flex:none}
+#growth .lite-preparation-scroll{max-height:200px;height:auto;min-height:0;flex:none;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:thin}
+#growth .lite-preparation-scroll ul{margin:5px 0 10px;padding-left:1.7em}
+#growth .lite-preparation-scroll ul:last-child{margin-bottom:0}
+#growth .lite-preparation-scroll:focus-visible{outline:2px solid #00d9f5;outline-offset:-2px}
