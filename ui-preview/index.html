@@ -585,6 +585,7 @@ function renderDevBoss(){
 }
 
 function newRun(){
+  lastMatchEarned=0;
   selectedEventCandidate=null;
   selectedSpecialIndex=null;
   if(typeof clearPointCue==="function")clearPointCue();
@@ -1902,12 +1903,13 @@ function finalResultSummary(){
 }
 function acquireSpecialCard(id){if(state.runFinished||state.eventDone||state.eventMode!=="training"||state.gp<2||!state.eventOptions.includes(id)||state.specialCardsGained.includes(id))return false;state.gp-=2;state.specialCardsGained.push(id);state.deck.push(id);addLog("特訓で「"+CARDS[id].name+"」を獲得。");finishEvent();return true}
 let selectedEventCandidate=null;
+let lastMatchEarned=0;
 function renderGrowth(earned){
   const box=$("growth");box.innerHTML="";
   if(state.runFinished){$("growthText").innerHTML="";box.innerHTML=finalResultSummary();$("next").style.display="none";return}
   if(state.preparing){$("growthText").innerHTML="";box.innerHTML=renderMatchPreparation();$("next").style.display="block";$("next").textContent="試合開始";return}
   $("next").textContent="対戦準備へ";
-  $("growthText").innerHTML="<div class=big>"+(state.my>=state.matchTarget?"勝利":"敗北")+"</div><p style=text-align:center>"+state.my+" - "+state.enemy+"<br>獲得 <b>"+earned+"pt</b> ／ 所持 <b>"+state.gp+"pt</b></p>";
+  $("growthText").innerHTML="<div class=big>"+(state.my>=state.matchTarget?"勝利":"敗北")+"</div><p style=text-align:center>"+state.my+" - "+state.enemy+"<br>獲得 <b>"+lastMatchEarned+"pt</b> ／ 所持 <b>"+state.gp+"pt</b></p>";
   $("next").style.display="block";
   if(state.eventMode==="choose"){
     if(state.eventCandidates.length===0){box.innerHTML="<div class=notice style='grid-column:1/-1'><b>イベントなし</b><br>次の試合へ進めます。</div>";return}
@@ -2058,7 +2060,7 @@ function finishMatch(){
   if(devBossResultVisible)return false;
   if(state.runFinished||state.matchFinished)return false;
   state.matchFinished=true;
-  const earned=matchGpReward(state.my,state.enemy,state.matchTarget);state.gp+=earned;
+  const earned=matchGpReward(state.my,state.enemy,state.matchTarget);lastMatchEarned=earned;state.gp+=earned;
   if(state.matchNumber>=10){
     state.runFinished=true;state.view="result";state.eventMode=null;state.eventDone=true;state.phase="growth";
     addLog(state.my>=state.matchTarget?"ラスボス撃破。全10試合クリア！":"第10試合で敗北。ラン終了。");
