@@ -315,13 +315,15 @@ function liteSituationModifiers({rotationSteps=0,speedSteps=0,lengthMismatch=fal
   ].filter(item=>item.value!==0);
 }
 const COST={stop:3,backDrive:3,foreBlock:3,foreFlick:4,backFlick:4,foreCut:4,backCut:4};
-const EVENT_NAMES={coach:"コーチ",practice:"練習",training:"特訓",equipment:"用具の購入",overwork:"オーバーワーク",cardOrganize:"カード整理",rest:"休憩"};
+const EVENT_NAMES={coach:"コーチ",practice:"練習",training:"特訓",equipment:"用具の購入",overwork:"オーバーワーク",cardOrganize:"カード整理",rest:"休憩",serveCoach:"サーブコーチ"};
 const SPECIAL_CARDS=["third","desperation","counter","finisher","feint","knuckleMastery"];const INITIAL_TECHNIQUES=["push","foreDrive","backBlock"];const isNewTechnique=id=>!INITIAL_TECHNIQUES.includes(id);
-const UPGRADE_EFFECTS={stop:"基本成功レベル◆+1",push:"適正回転に下回転★2を追加",foreDrive:"返球回転段階+1（上限★2）",backDrive:"適正長さにショートを追加",foreBlock:"返球速度を入力速度−1（最低★1）に変更",backBlock:"返球速度を入力速度−1（最低★1）に変更",foreFlick:"返球速度+1",backFlick:"基本成功レベル◆+1",foreCut:"返球回転段階+1（上限★2）",backCut:"適正回転に上回転★2を追加",foreSmash:"返球速度+1",underShort:"下回転量+1",knuckleLong:"速度+1"};
+const UPGRADE_EFFECTS={stop:"基本成功レベル◆+1",push:"適正回転に下回転★2を追加",foreDrive:"返球回転段階+1（上限★2）",backDrive:"適正長さにショートを追加",foreBlock:"返球速度を入力速度−1（最低★1）に変更",backBlock:"返球速度を入力速度−1（最低★1）に変更",foreFlick:"返球速度+1",backFlick:"基本成功レベル◆+1",foreCut:"返球回転段階+1（上限★2）",backCut:"適正回転に上回転★2を追加",foreSmash:"返球速度+1",underShort:"下回転量+1",knuckleLong:"速度+1",topLong:"速度+1",underLong:"下回転量+1"};
 
 const SERVES={
  underShort:{name:"下回転サーブ",spin:"下",spinLevel:1,power:1,length:"ショート",desc:"下回転・★1・ショート"},
- knuckleLong:{name:"ナックルサーブ",spin:"無",spinLevel:1,power:1,length:"ロング",desc:"無回転・速度★1・ロング"}
+ knuckleLong:{name:"ナックルサーブ",spin:"無",spinLevel:1,power:1,length:"ロング",desc:"無回転・速度★1・ロング"},
+ topLong:{name:"上回転サーブ",spin:"上",spinLevel:1,power:2,length:"ロング",desc:"上回転★1・速度★2・ロング"},
+ underLong:{name:"下回転ロングサーブ",spin:"下",spinLevel:1,power:1,length:"ロング",desc:"下回転★1・速度★1・ロング"}
 };
 
 const CARDS={
@@ -583,6 +585,7 @@ function renderDevBoss(){
 }
 
 function newRun(){
+  selectedEventCandidate=null;
   selectedSpecialIndex=null;
   if(typeof clearPointCue==="function")clearPointCue();
   state.view="match";state.matchNumber=1;state.matchTarget=3;state.bossTest=false;state.runFinished=false;state.matchFinished=false;
@@ -855,13 +858,13 @@ function renderServe(){
     const upgraded=techIsUpgraded(id);
     const spinLevel=serveSpinLevel(id,upgraded);
     const power=servePower(id,upgraded);
-    const spinLabel=s.spin==="下"?"↺ 下回転":"○ 無回転";
-    const art=s.spin==="下"?"↺":"○";
+    const spinLabel=s.spin==="下"?"↺ 下回転":s.spin==="上"?"↻ 上回転":"○ 無回転";
+    const art=s.spin==="下"?"↺":s.spin==="上"?"↻":"○";
     b.setAttribute("aria-label",s.name+"、"+spinLabel+"、速度"+power+"、"+s.length+(state.selectedServe===id?"、選択中":""));
     b.innerHTML="<span class='card-stamp'>"+(state.selectedServe===id?"選択中":"選択")+"</span>"+
       "<span class='card-art' aria-hidden='true'><span class='lite-serve-spin-glyph'>"+art+"</span></span>"+
       "<span class='card-name'>"+techName(id)+"</span>"+
-      "<span class='card-description'><span class='lite-serve-stat'>回転 "+spinLabel+(s.spin==="下"?" ★"+spinLevel:"")+"</span><span class='lite-serve-stat'>速度 ⚡"+power+"</span><span class='lite-serve-stat'>長さ "+s.length+"</span></span>";
+      "<span class='card-description'><span class='lite-serve-stat'>回転 "+spinLabel+(s.spin!=="無"?" ★"+spinLevel:"")+"</span><span class='lite-serve-stat'>速度 ⚡"+power+"</span><span class='lite-serve-stat'>長さ "+s.length+"</span></span>";
     b.onclick=()=>{state.selectedServe=id;state.selectedServeCourse=null;render()};
     strip.appendChild(b);
   });
@@ -873,7 +876,7 @@ function renderServe(){
       detail.textContent="サーブカードを選ぶと回転・速度・長さを表示します。";
     }else{
       const upgraded=techIsUpgraded(id);
-      const spinLabel=s.spin==="下"?"↺ 下回転 ★"+serveSpinLevel(id,upgraded):"○ 無回転";
+      const spinLabel=s.spin==="下"?"↺ 下回転 ★"+serveSpinLevel(id,upgraded):s.spin==="上"?"↻ 上回転 ★"+serveSpinLevel(id,upgraded):"○ 無回転";
       detail.innerHTML="<div class='lite-serve-detail-title'>"+techName(id)+" <span>選択中</span></div>"+
         "<div class='lite-serve-detail-stats'><div><b>回転</b>"+spinLabel+"</div><div><b>速度</b>⚡"+servePower(id,upgraded)+"</div><div><b>長さ</b>"+s.length+"</div></div>"+
         "<p>サーブ先を選ぶと、そのままサーブを実行します。</p>";
@@ -1262,8 +1265,8 @@ function renderHistory(){
 }
 function renderLog(){$("log").innerHTML=state.log.map(x=>"<div class=\"log-row\">"+x+"</div>").join("")}
 
-function serveSpinLevel(id,upgraded){const s=SERVES[id];return Math.min(s.spinLevel+(upgraded&&id==="underShort"?1:0),SPIN_LEVEL_LIMIT)}
-function servePower(id,upgraded){const s=SERVES[id];return s.power+(upgraded&&id==="knuckleLong"?1:0)}
+function serveSpinLevel(id,upgraded){const s=SERVES[id];return Math.min(s.spinLevel+(upgraded&&(id==="underShort"||id==="underLong")?1:0),SPIN_LEVEL_LIMIT)}
+function servePower(id,upgraded){const s=SERVES[id];return s.power+(upgraded&&(id==="knuckleLong"||id==="topLong")?1:0)}
 function executeServe(){
   if(state.runFinished||!state.selectedServe||!state.selectedServeCourse)return;
   const s=SERVES[state.selectedServe];
@@ -1766,9 +1769,10 @@ function techIsUpgraded(id){return state.upgradedTechs.includes(id)||state.upgra
 function techName(id){return (TECHS[id]||SERVES[id]).name+(techIsUpgraded(id)?"＋":"")}
 function eligibleUpgradeTechs(){return state.learned.filter(id=>!techIsUpgraded(id))}
 function eligibleUpgradeServes(){return state.serves.filter(id=>!techIsUpgraded(id))}
-function coachEligibleTechs(){return Object.keys(TECHS).filter(id=>id!=="foreCut"&&id!=="backCut"&&!state.learned.includes(id))}
+function coachEligibleTechs(){return Object.keys(TECHS).filter(id=>!state.learned.includes(id))}
 function eventAvailable(id){
   if(id==="rest")return true;
+  if(id==="serveCoach")return state.matchNumber===3&&!state.serves.some(serve=>serve==="topLong"||serve==="underLong");
   if(id==="coach")return coachEligibleTechs().length>0;
   if(id==="practice")return eligibleUpgradeTechs().length+eligibleUpgradeServes().length>0;
   if(id==="training")return SPECIAL_CARDS.some(id=>!state.specialCardsGained.includes(id));
@@ -1777,51 +1781,82 @@ function eventAvailable(id){
   if(id==="overwork")return eligibleUpgradeTechs().length+eligibleUpgradeServes().length>0;
   return false;
 }
-function generateEventCandidates(){
-  const candidates=Object.keys(EVENT_NAMES).filter(eventAvailable);
-  shuffle(candidates);
-  return candidates.slice(0,2);
+const E3_EVENT_SCHEDULE={
+  1:{fixed:"coach",count:2},2:{fixed:"coach",count:2},
+  3:{fixed:"serveCoach",count:0},4:{fixed:"practice",count:2},
+  5:{fixed:"practice",count:2},6:{fixed:"equipment",count:0},
+  7:{fixed:null,count:3},8:{fixed:null,count:3},
+  9:{fixed:"rest",count:2}
+};
+const E3_RANDOM_ELIGIBILITY={
+  coach:[4,5,7,8,9],practice:[1,2,7,8,9],
+  training:[1,2,4,5,7,8,9],overwork:[1,2,4,5,7,8,9],
+  cardOrganize:[1,2,4,5,7,8,9],rest:[1,2,4,5,7,8]
+};
+function eventSchedule(matchNumber=state.matchNumber){
+  return E3_EVENT_SCHEDULE[matchNumber]||{fixed:null,count:0};
+}
+function eligibleRandomEvents(excluded=[]){
+  const fixed=eventSchedule().fixed;
+  return Object.keys(E3_RANDOM_ELIGIBILITY).filter(id=>
+    id!==fixed&&E3_RANDOM_ELIGIBILITY[id].includes(state.matchNumber)&&
+    !excluded.includes(id)&&eventAvailable(id));
+}
+function generateEventCandidates(excluded=[],requestedCount=null){
+  const schedule=eventSchedule();
+  const count=requestedCount===null?schedule.count:requestedCount;
+  const available=eligibleRandomEvents(excluded);
+  shuffle(available);
+  return available.slice(0,count);
 }
 function sameEventCandidateSet(a,b){
   return Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&a.slice().sort().every((id,i)=>id===b.slice().sort()[i]);
 }
 function validEventCandidateSet(ids){
-  return Array.isArray(ids)&&ids.length<=2&&new Set(ids).size===ids.length&&ids.every(id=>Object.prototype.hasOwnProperty.call(EVENT_NAMES,id)&&eventAvailable(id));
+  return Array.isArray(ids)&&ids.length<=eventSchedule().count&&new Set(ids).size===ids.length&&
+    ids.every(id=>eligibleRandomEvents().includes(id));
 }
 function canRerollEvents(){
-  if(state.runFinished||state.eventMode!=="choose"||state.eventDone||state.gp<2||state.eventRerolling)return false;
-  if(!Array.isArray(state.eventCandidates)||state.eventCandidates.length===0)return false;
-  const available=Object.keys(EVENT_NAMES).filter(eventAvailable);
-  return available.length>state.eventCandidates.length;
+  if(state.runFinished||state.eventMode!=="choose"||state.eventDone||state.gp<1||state.eventRerolling)return false;
+  const current=state.eventRandomCandidates||[];
+  return current.length>0&&eligibleRandomEvents(current).length>=current.length;
 }
 function rerollEvents(){
   if(!canRerollEvents())return false;
   state.eventRerolling=true;
   let candidates;
   try{
-    candidates=generateEventCandidates();
-    if(!validEventCandidateSet(candidates)||sameEventCandidateSet(candidates,state.eventCandidates))return false;
+    const previous=state.eventRandomCandidates.slice();
+    candidates=generateEventCandidates(previous,previous.length);
+    if(candidates.length!==previous.length||!validEventCandidateSet(candidates))return false;
   }catch(e){
     return false;
   }finally{
     state.eventRerolling=false;
   }
-  state.eventCandidates=candidates;
-  state.gp-=2;
-  addLog("イベント候補を再抽選（2pt消費）。");
+  selectedEventCandidate=null;
+  state.eventRandomCandidates=candidates;
+  state.eventCandidates=[...(state.eventFixed?[state.eventFixed]:[]),...candidates];
+  state.gp-=1;
+  addLog("イベント候補を再抽選（1pt消費）。");
   renderGrowth(0);render();
   return true;
 }
 function beginEvents(){
   if(devBossSession||state.runFinished||state.matchNumber>=10)return false;
   state.overworkUpgrades=null;
-  state.eventCandidates=generateEventCandidates();
+  selectedEventCandidate=null;
+  const schedule=eventSchedule();
+  state.eventFixed=schedule.fixed;
+  state.eventRandomCandidates=generateEventCandidates();
+  state.eventCandidates=[...(schedule.fixed?[schedule.fixed]:[]),...state.eventRandomCandidates];
   state.eventOptions=[];
   state.eventMode="choose";state.eventDone=state.eventCandidates.length===0;state.eventRerolling=false;state.phase="growth";
   return true;
 }
-function upgrade(id){if(state.runFinished)return false;if(id==="underShort"||id==="knuckleLong")state.upgradedServes.push(id);else state.upgradedTechs.push(id);addLog(techName(id)+"を＋強化。");return true}
+function upgrade(id){if(state.runFinished)return false;if(Object.prototype.hasOwnProperty.call(SERVES,id))state.upgradedServes.push(id);else state.upgradedTechs.push(id);addLog(techName(id)+"を＋強化。");return true}
 function eventDesc(id){
+  if(id==="serveCoach")return "新しいサーブ2種類から1つを2ptで習得。第4試合から使用可能。";
   if(id==="rest")return "0pt。次の1試合の成功レベル◆+1、または空振りをすべて削除。";
   if(id==="coach")return "未習得の返球技術から1つを2ptで習得。";
   if(id==="practice")return "習得済みの未強化スキルカード・サーブから自由に1つを1ptで＋強化。";
@@ -1832,11 +1867,13 @@ function eventDesc(id){
 }
 function selectEvent(id){
   if(state.runFinished||state.eventDone||state.eventMode!=="choose"||!state.eventCandidates.includes(id))return false;
+  if(id==="serveCoach"&&state.matchNumber!==3)return false;
   state.overworkUpgrades=null;
   state.eventMode=id;
   state.eventCandidates=[];
   state.eventOptions=[];
   if(id==="coach")state.eventOptions=coachEligibleTechs().sort(()=>Math.random()-.5).slice(0,3);
+  if(id==="serveCoach")state.eventOptions=["topLong","underLong"];
   if(id==="training")state.eventOptions=SPECIAL_CARDS.filter(card=>!state.specialCardsGained.includes(card)).sort(()=>Math.random()-.5).slice(0,3);
   renderGrowth(0);render();
   return true;
@@ -1864,6 +1901,7 @@ function finalResultSummary(){
   return "<div class=notice style='grid-column:1/-1'><h2>"+(won?"勝利！":"敗北…")+"</h2><b>"+(won?"全10試合クリア！":"第10試合で敗北しました。")+"</b><p>最終スコア："+state.my+" - "+state.enemy+"</p>"+lastPoint+"<p>最終試合の獲得GP："+matchGpReward(state.my,state.enemy,state.matchTarget)+"pt</p><p>所持GP："+state.gp+"pt</p><h3>所持カード（"+state.deck.length+"枚）</h3><ul>"+cards+"</ul></div>";
 }
 function acquireSpecialCard(id){if(state.runFinished||state.eventDone||state.eventMode!=="training"||state.gp<2||!state.eventOptions.includes(id)||state.specialCardsGained.includes(id))return false;state.gp-=2;state.specialCardsGained.push(id);state.deck.push(id);addLog("特訓で「"+CARDS[id].name+"」を獲得。");finishEvent();return true}
+let selectedEventCandidate=null;
 function renderGrowth(earned){
   const box=$("growth");box.innerHTML="";
   if(state.runFinished){$("growthText").innerHTML="";box.innerHTML=finalResultSummary();$("next").style.display="none";return}
@@ -1874,13 +1912,37 @@ function renderGrowth(earned){
   if(state.eventMode==="choose"){
     if(state.eventCandidates.length===0){box.innerHTML="<div class=notice style='grid-column:1/-1'><b>イベントなし</b><br>次の試合へ進めます。</div>";return}
     box.innerHTML="<div class=notice style='grid-column:1/-1'><b>イベントから1つ選択</b></div>";
-    state.eventCandidates.forEach(id=>{const b=document.createElement("button");b.className="btn";const shortage=(id==="overwork"||id==="cardOrganize")?gpShortageText(2):"";b.innerHTML="<b>"+EVENT_NAMES[id]+"</b><small>"+eventDesc(id)+(shortage?"<br><b class='gp-shortage'>"+shortage+"</b>":"")+"</small>";b.onclick=()=>selectEvent(id);box.appendChild(b)});
-    if(state.eventCandidates.length>0){
-      const reroll=document.createElement("button");reroll.className="btn";reroll.disabled=!canRerollEvents();reroll.innerHTML="<b>候補を再抽選　2pt</b><small>"+(reroll.disabled?"再抽選できません":"候補を変更できた場合のみ2pt消費")+"</small>";reroll.onclick=()=>rerollEvents();box.appendChild(reroll);
+    const cards=document.createElement("div");
+    cards.style.cssText="grid-column:1/-1;display:flex;justify-content:center;gap:8px;width:100%;";
+    const costs={coach:2,serveCoach:2,practice:1,training:2,equipment:3,overwork:2,cardOrganize:2,rest:0};
+    if(!state.eventCandidates.includes(selectedEventCandidate))selectedEventCandidate=null;
+    state.eventCandidates.forEach(id=>{
+      const b=document.createElement("button");b.type="button";b.className="btn";
+      b.style.cssText="box-sizing:border-box;flex:0 1 31%;min-width:0;max-width:160px;aspect-ratio:3/4;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:10px;padding:8px;overflow-wrap:anywhere;";
+      b.setAttribute("aria-pressed",String(selectedEventCandidate===id));
+      if(selectedEventCandidate===id)b.style.outline="3px solid currentColor";
+      const shortage=(id==="overwork"||id==="cardOrganize")?gpShortageText(2):"";
+      b.innerHTML="<b>"+EVENT_NAMES[id]+"</b><small>"+costs[id]+"pt"+(shortage?"<br><b class='gp-shortage'>"+shortage+"</b>":"")+"</small>";
+      b.onclick=()=>{selectedEventCandidate=id;renderGrowth(0)};
+      cards.appendChild(b);
+    });
+    box.appendChild(cards);
+    if(selectedEventCandidate){
+      const confirm=document.createElement("button");confirm.type="button";confirm.className="btn";confirm.style.gridColumn="1/-1";
+      confirm.innerHTML="<b>"+EVENT_NAMES[selectedEventCandidate]+"に進む</b>";
+      confirm.onclick=()=>{const id=selectedEventCandidate;selectedEventCandidate=null;selectEvent(id)};
+      box.appendChild(confirm);
+    }
+    if((state.eventRandomCandidates||[]).length>0){
+      const reroll=document.createElement("button");reroll.className="btn";reroll.disabled=!canRerollEvents();reroll.innerHTML="<b>候補を再抽選　1pt</b><small>"+(reroll.disabled?"再抽選できません":"候補を変更できた場合のみ1pt消費")+"</small>";reroll.onclick=()=>rerollEvents();box.appendChild(reroll);
     }
     return;
   }
   if(state.eventDone){const overworkText=overworkResultText();box.innerHTML="<div class=notice style='grid-column:1/-1'><b>イベント完了</b><br>次の試合へ進めます。"+(overworkText?"<br><b>"+overworkText+"</b>":"")+"</div>";return}
+  if(state.eventMode==="serveCoach"){
+    box.innerHTML="<div class=notice style='grid-column:1/-1'><b>サーブコーチ：新サーブを1種類習得（2pt）</b><br>所持 "+state.gp+"pt</div>";
+    state.eventOptions.forEach(id=>{const b=document.createElement("button");b.className="btn";const serve=SERVES[id];b.innerHTML="<b>"+serve.name+"　2pt</b><small>"+serve.desc+"</small>";b.onclick=()=>{if(state.runFinished||state.eventDone||state.eventMode!=="serveCoach"||state.matchNumber!==3||!state.eventOptions.includes(id)||state.serves.includes(id)||state.serves.some(x=>x==="topLong"||x==="underLong"))return;if(state.gp<2){showGpShortage(b,2);return}state.gp-=2;state.serves.push(id);addLog("サーブコーチで"+serve.name+"を習得。");finishEvent()};box.appendChild(b)});return;
+  }
   if(state.eventMode==="coach"){
     box.innerHTML="<div class=notice style='grid-column:1/-1'><b>コーチ：未習得の返球技術から1つを2ptで習得</b><br>所持 "+state.gp+"pt</div>";
     state.eventOptions.forEach(id=>{const b=document.createElement("button");b.className="btn";b.innerHTML="<b>"+TECHS[id].name+"　2pt</b><small>"+TECHS[id].desc+"</small>";b.onclick=()=>{if(state.runFinished||state.eventDone||state.eventMode!=="coach")return;if(state.gp<2){showGpShortage(b,2);return}state.gp-=2;state.learned.push(id);addLog("コーチで"+TECHS[id].name+"を習得。");finishEvent()};box.appendChild(b)});return;
