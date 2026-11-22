@@ -328,3 +328,7 @@ body.is-match-view #matchView .lite-serve-indicator.is-serving{display:inline-bl
 #growth .lite-preparation-scroll ul.lite-preparation-items:last-child{margin-bottom:0}
 #growth .lite-preparation-items li{min-width:0;overflow-wrap:anywhere;word-break:normal;background:rgba(83,173,206,.09);border:1px solid rgba(83,173,206,.2);border-radius:5px;padding:5px 6px}
 @media(max-width:340px){#growth .lite-preparation-scroll{font-size:12px}#growth .lite-preparation-items li{padding:4px}}
+
+/* D-18: compact court-to-controls spacing outside rally animation. */
+body.is-match-view #matchView:not(.lite-rally-active) .table.lite-perspective-table{margin:12px 0 8px}
+body.is-match-view #matchView:not(.lite-rally-active) #ballInfo{margin:4px 0}
