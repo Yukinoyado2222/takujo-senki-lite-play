@@ -630,7 +630,7 @@ function startPreparedMatch(){
   resetCardPiles();pointReset();render();return true;
 }
 function renderMatchPreparation(){
-  const list=(ids,upgraded,defs,withType)=>ids.map(id=>"<li>"+defs[id].name+(withType?"（"+defs[id].type+"）":"")+(upgraded.includes(id)?" ＋強化":"")+"</li>").join("");
+  const list=(ids,upgraded,defs,withType)=>ids.map(id=>"<li>"+defs[id].name+(upgraded.includes(id)?"＋":"")+"</li>").join("");
   const group=(title,techTitle,techs,serveTitle,serves)=>"<section class='notice lite-preparation-panel'><h3 class='lite-preparation-heading'>"+title+"</h3><div class='lite-preparation-scroll scroll-body' tabindex='0' role='region' aria-label='"+title+"の技術とサーブ'><b>"+techTitle+"</b><ul class='lite-preparation-items'>"+techs+"</ul><b>"+serveTitle+"</b><ul class='lite-preparation-items'>"+serves+"</ul></div></section>";
   return "<div class='notice lite-preparation-summary'><b>第"+state.matchNumber+"試合｜対戦準備</b><p>対戦相手："+enemy.name+" ／ "+state.matchTarget+"点先取</p></div>"+
     group("対戦相手｜"+enemy.name,"相手の使用技術",list(enemy.techs,enemy.upgradedTechs,TECHS,true),"相手のサーブ",list(enemy.serves,enemy.upgradedServes,SERVES,false))+
